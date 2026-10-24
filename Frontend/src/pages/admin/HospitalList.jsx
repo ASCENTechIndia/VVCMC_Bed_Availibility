@@ -32,7 +32,7 @@ export default function HospitalList() {
     <>
       <div className="ph">
         <h1>Hospital Master</h1>
-        <Link className="btn" to="/admin/hospitals/add">+ Add New Hospital</Link>
+        <Link className="btn" to="/hospitals/add">+ Add New Hospital</Link>
       </div>
       <form
         className="card bar"
@@ -79,8 +79,8 @@ export default function HospitalList() {
                 <td>{h.phone}</td>
                 <td><span className={`tag ${h.active ? 'ok' : 'no'}`}>{h.active ? 'Active' : 'Inactive'}</span></td>
                 <td>
-                  <Link className="btn s" to={`/admin/hospitals/edit?id=${h.id}`}>Edit</Link>{' '}
-                  <Link className="btn s y" to={`/admin/bed-capacity?hospital_id=${h.id}`}>Capacity</Link>{' '}
+                  <Link className="btn s" to={`/hospitals/edit?id=${h.id}`}>Edit</Link>{' '}
+                  <Link className="btn s y" to={`/bed-capacity?hospital_id=${h.id}`}>Capacity</Link>{' '}
                   <button type="button" className={`btn s ${h.active ? 'd' : ''}`} onClick={() => toggleHospitalStatus(h.id)}>
                     {h.active ? 'Deactivate' : 'Activate'}
                   </button>

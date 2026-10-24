@@ -43,8 +43,8 @@ export default function Dashboard() {
                   <td>{formatDateTime(h.lastUpdated)}</td>
                   <td><span className={`tag ${ok ? 'ok' : 'no'}`}>{ok ? 'Updated today' : 'Not updated today'}</span></td>
                   <td>
-                    <Link className="btn s y" to={`/admin/bed-update?hospital_id=${h.id}`}>Update Status</Link>{' '}
-                    <Link className="btn s" to={`/admin/bed-capacity?hospital_id=${h.id}`}>Capacity</Link>
+                    <Link className="btn s y" to={`/bed-update?hospital_id=${h.id}`}>Update Status</Link>{' '}
+                    <Link className="btn s" to={`/bed-capacity?hospital_id=${h.id}`}>Capacity</Link>
                   </td>
                 </tr>
               );
