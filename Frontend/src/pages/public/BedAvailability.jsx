@@ -72,7 +72,7 @@ export default function BedAvailability() {
             ))}
           </select>
         </div>
-        <div>
+        {/* <div>
           <label htmlFor="q">Search / शोधा</label>
           <input
             type="text"
@@ -82,7 +82,7 @@ export default function BedAvailability() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-        </div>
+        </div> */}
         <button className="btn" type="submit">Search</button>
       </form>
       {notFound && <p className="note">No hospital found for “{q}”.</p>}

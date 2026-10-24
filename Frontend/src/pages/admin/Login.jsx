@@ -139,7 +139,7 @@ export default function Login() {
         </button>
       </form>
       <p className="sm c">
-        <a
+        {/* <a
           href="#forgot"
           onClick={(e) => {
             e.preventDefault();
@@ -147,7 +147,7 @@ export default function Login() {
           }}
         >
           Forgot password?
-        </a>
+        </a> */}
       </p>
       <p className="sm c" style={{ marginTop: '12px' }}>
         <Link to="/citizendashboard">← Citizen Bed Availability Dashboard</Link>

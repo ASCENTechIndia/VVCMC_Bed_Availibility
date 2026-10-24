@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { post } from '../../services/apiService.js';
+import Modal from '../../components/Modal.jsx';
 
 const PAGE_SIZE = 10;
-const DEFAULT_TYPES = ['Municipal', 'Trust', 'Private'];
+const DEFAULT_TYPES = ['Municipal', 'Government', 'Private', 'Trust'];
 
 function normalizeHospital(h) {
   const id = Number(h.NUM_HOSPITAL_ID ?? h.id ?? 0);
@@ -63,12 +64,20 @@ export default function HospitalList() {
   const [filter, setFilter] = useState(draft);
   const [page, setPage] = useState(1);
 
+  // Modal states for delete/deactivate confirmation and response notice
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [targetHospital, setTargetHospital] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
   const fetchHospitals = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
 
-      const targetUlbId = Number(user?.ulbId);
+      const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
       const res = await post('/hospitalMst/hospitalList', { ulbid: targetUlbId });
 
       const rawList = Array.isArray(res?.data)
@@ -77,7 +86,7 @@ export default function HospitalList() {
           ? res
           : [];
 
-      const normalized = rawList.map((item) => normalizeHospital(item, targetUlbId));
+      const normalized = rawList.map((item) => normalizeHospital(item));
       setHospitals(normalized);
     } catch (err) {
       console.error('Error fetching hospital master list:', err);
@@ -85,27 +94,112 @@ export default function HospitalList() {
     } finally {
       setLoading(false);
     }
-  }, [user?.ulbId]);
+  }, [user?.ulbId, user?.ulbd]);
 
   useEffect(() => {
     fetchHospitals();
   }, [fetchHospitals]);
 
-  const toggleStatus = (id) => {
-    setHospitals((prev) =>
-      prev.map((h) => {
-        if (h.id === id) {
-          const newActive = !h.active;
-          return {
-            ...h,
-            active: newActive,
-            status: newActive ? 'Y' : 'N',
-            VAR_HOSPITAL_STATUS: newActive ? 'Y' : 'N',
-          };
-        }
-        return h;
-      })
-    );
+  // Click on Deactivate/Activate button
+  const handleToggleStatusClick = (hospital) => {
+    setTargetHospital(hospital);
+    if (hospital.active) {
+      // Deactivating/deleting with mode 3: ask for confirmation first
+      setConfirmModalOpen(true);
+    } else {
+      // Activating with mode 2
+      handleActivateHospital(hospital);
+    }
+  };
+
+  // Execute mode = 3 to delete / deactivate the hospital
+  const handleDeleteConfirm = async () => {
+    if (!targetHospital) return;
+
+    try {
+      setDeleting(true);
+      const targetHospitalId = Number(targetHospital.id || targetHospital.NUM_HOSPITAL_ID);
+      const targetUlbId = Number(user?.ulbId || user?.ulbd || targetHospital.ulbid) || 790;
+
+      const payload = {
+        userId: user?.userId || 'admin',
+        hospitalId: targetHospitalId,
+        ulbId: targetUlbId,
+        hospitalName: targetHospital.name || targetHospital.VAR_HOSPITAL_NAME || 'Hospital',
+        hospitalType: targetHospital.type || targetHospital.VAR_HOSPITAL_TYPE || '',
+        address: targetHospital.address || targetHospital.VAR_HOSPITAL_ADDRESS || '',
+        areaWard: targetHospital.area || targetHospital.VAR_HOSPITAL_AREA_WARD || '',
+        pincode: String(targetHospital.pincode || targetHospital.VAR_HOSPITAL_PINCODE || '401303'),
+        phone: String(targetHospital.phone || targetHospital.VAR_HOSPITAL_PHONE || '9876543210'),
+        email: targetHospital.email || targetHospital.VAR_HOSPITAL_EMAIL || '',
+        status: 'N',
+        mode: 3,
+      };
+
+      const res = await post('/hospitalMst/insertHospital', payload);
+
+      const errorCode = String(res?.data?.errorCode ?? res?.errorCode ?? '');
+      if (errorCode && errorCode !== '9999') {
+        throw new Error(res?.data?.message || res?.message || 'Failed to delete hospital');
+      }
+
+      setConfirmModalOpen(false);
+      setSuccessMessage(
+        res?.data?.message || res?.message || 'Hospital deleted successfully.'
+      );
+      setSuccessModalOpen(true);
+
+      // Refresh list to show updated status
+      await fetchHospitals();
+    } catch (err) {
+      console.error('Error deleting hospital (mode 3):', err);
+      setError(err?.message || 'Failed to delete hospital. Please try again.');
+      setConfirmModalOpen(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Reactivate hospital using mode = 2
+  const handleActivateHospital = async (hospital) => {
+    try {
+      setLoading(true);
+      const targetHospitalId = Number(hospital.id || hospital.NUM_HOSPITAL_ID);
+      const targetUlbId = Number(user?.ulbId || user?.ulbd || hospital.ulbid) || 790;
+
+      const payload = {
+        userId: user?.userId || 'admin',
+        hospitalId: targetHospitalId,
+        ulbId: targetUlbId,
+        hospitalName: hospital.name || hospital.VAR_HOSPITAL_NAME || 'Hospital',
+        hospitalType: hospital.type || hospital.VAR_HOSPITAL_TYPE || '',
+        address: hospital.address || hospital.VAR_HOSPITAL_ADDRESS || '',
+        areaWard: hospital.area || hospital.VAR_HOSPITAL_AREA_WARD || '',
+        pincode: String(hospital.pincode || hospital.VAR_HOSPITAL_PINCODE || '401303'),
+        phone: String(hospital.phone || hospital.VAR_HOSPITAL_PHONE || '9876543210'),
+        email: hospital.email || hospital.VAR_HOSPITAL_EMAIL || '',
+        status: 'Y',
+        mode: 2,
+      };
+
+      const res = await post('/hospitalMst/insertHospital', payload);
+
+      const errorCode = String(res?.data?.errorCode ?? res?.errorCode ?? '');
+      if (errorCode && errorCode !== '9999') {
+        throw new Error(res?.data?.message || res?.message || 'Failed to activate hospital');
+      }
+
+      setSuccessMessage(
+        res?.data?.message || res?.message || 'Hospital activated successfully.'
+      );
+      setSuccessModalOpen(true);
+      await fetchHospitals();
+    } catch (err) {
+      console.error('Error activating hospital:', err);
+      setError(err?.message || 'Failed to activate hospital. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const availableTypes = useMemo(() => {
@@ -222,10 +316,10 @@ export default function HospitalList() {
                     <Link className="btn s y" to={`/bed-capacity?hospital_id=${h.id}`}>Capacity</Link>{' '}
                     <button
                       type="button"
-                      className={`btn s ${h.active ? 'd' : ''}`}
-                      onClick={() => toggleStatus(h.id)}
+                      className="btn s d"
+                      onClick={() => handleToggleStatusClick(h)}
                     >
-                      {h.active ? 'Deactivate' : 'Activate'}
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -251,6 +345,35 @@ export default function HospitalList() {
           <a href="#" onClick={go(cur + 1)}>Next &raquo;</a>
         </div>
       )}
+
+      {/* Confirmation Modal for Deactivate / Delete */}
+      <Modal
+        isOpen={confirmModalOpen}
+        type="confirm"
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete "${targetHospital?.name || 'this hospital'}"?`}
+        showCancel
+        onCancel={() => {
+          setConfirmModalOpen(false);
+          setTargetHospital(null);
+        }}
+        onOk={handleDeleteConfirm}
+        okText="OK"
+        cancelText="Cancel"
+        confirmLoading={deleting}
+      />
+
+      {/* Success Notification Modal */}
+      <Modal
+        isOpen={successModalOpen}
+        title="Success"
+        message={successMessage}
+        onOk={() => {
+          setSuccessModalOpen(false);
+          setTargetHospital(null);
+        }}
+        okText="OK"
+      />
     </>
   );
 }
