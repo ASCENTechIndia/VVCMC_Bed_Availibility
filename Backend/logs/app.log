@@ -1,134 +1,47 @@
-{"level":30,"time":1792826985172,"pid":21412,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792826985204,"pid":21412,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792827470506,"pid":17592,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792827470554,"pid":17592,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792827532739,"pid":13448,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792827532784,"pid":13448,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838288783,"pid":23032,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838288825,"pid":23032,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838292449,"pid":23332,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838292511,"pid":23332,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838300900,"pid":18232,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838300938,"pid":18232,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838307968,"pid":4144,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838307994,"pid":4144,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838315610,"pid":18616,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838315635,"pid":18616,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838326480,"pid":8240,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838326506,"pid":8240,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838505626,"pid":1420,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838505654,"pid":1420,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838513740,"pid":6628,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838513795,"pid":6628,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838516221,"pid":6816,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838516241,"pid":6816,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838539909,"pid":19944,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838539974,"pid":19944,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838554561,"pid":23200,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838554667,"pid":23200,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838563737,"pid":14712,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838563788,"pid":14712,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838567109,"pid":17332,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838567145,"pid":17332,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838594020,"pid":15000,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838594041,"pid":15000,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838609471,"pid":7288,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838609521,"pid":7288,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838613273,"pid":15152,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838613290,"pid":15152,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838622421,"pid":22940,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838622449,"pid":22940,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838653621,"pid":17948,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838653664,"pid":17948,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838660015,"pid":9748,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838660083,"pid":9748,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838668871,"pid":22788,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838668913,"pid":22788,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838675350,"pid":12332,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838675382,"pid":12332,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838697725,"pid":13728,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838697760,"pid":13728,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838708249,"pid":10064,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838708311,"pid":10064,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838712407,"pid":14240,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838712434,"pid":14240,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838717267,"pid":20056,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838717286,"pid":20056,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838722566,"pid":10488,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838722587,"pid":10488,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838729501,"pid":17820,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838729537,"pid":17820,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838744061,"pid":19044,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838744086,"pid":19044,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838748652,"pid":6928,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838748674,"pid":6928,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838753027,"pid":1456,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838753066,"pid":1456,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838757325,"pid":772,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838757350,"pid":772,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838764204,"pid":9364,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838764246,"pid":9364,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838889695,"pid":19324,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838889722,"pid":19324,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792838908781,"pid":13440,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792838908887,"pid":13440,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839027812,"pid":10868,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839027841,"pid":10868,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839036266,"pid":21516,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839036310,"pid":21516,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839040760,"pid":18072,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839040817,"pid":18072,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839197076,"pid":1444,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839197117,"pid":1444,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839472456,"pid":17860,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839472472,"pid":17860,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839499738,"pid":7536,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839499788,"pid":7536,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839508836,"pid":16304,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839508852,"pid":16304,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839525823,"pid":18972,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839525855,"pid":18972,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839534732,"pid":19860,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839534764,"pid":19860,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839568978,"pid":21316,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839569019,"pid":21316,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839584920,"pid":9996,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839584957,"pid":9996,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839589963,"pid":17748,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839590001,"pid":17748,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839593952,"pid":15256,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839594001,"pid":15256,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839613028,"pid":6048,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839613064,"pid":6048,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839668927,"pid":10940,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839668950,"pid":10940,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839748885,"pid":19628,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839748933,"pid":19628,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839754179,"pid":19832,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839754208,"pid":19832,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839783047,"pid":14024,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839783080,"pid":14024,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839793055,"pid":7368,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839793087,"pid":7368,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839810223,"pid":16616,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839810257,"pid":16616,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839834281,"pid":13660,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839834310,"pid":13660,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792839837407,"pid":11032,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792839837440,"pid":11032,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792840086335,"pid":7348,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792840086380,"pid":7348,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792840113487,"pid":15544,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792840113517,"pid":15544,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792840117534,"pid":18360,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792840117572,"pid":18360,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792840133989,"pid":18360,"hostname":"DESKTOP-P3JAJN9","audit":{"ts":"2026-10-24T11:08:53.989Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"admin","status":"SUCCESS","requestMeta":{"ip":"::ffff:127.0.0.1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Inserted Successfully"}},"msg":"Audit event"}
-{"level":30,"time":1792841892672,"pid":19404,"hostname":"DESKTOP-N4U5EV1","dbName":"db1","msg":"Oracle pool initialized"}
-{"level":30,"time":1792841892693,"pid":19404,"hostname":"DESKTOP-N4U5EV1","port":5000,"env":"development","msg":"Server started"}
-{"level":30,"time":1792841931695,"pid":19404,"hostname":"DESKTOP-N4U5EV1","audit":{"ts":"2026-10-24T11:38:51.691Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"admin","status":"FAILED","requestMeta":{"ip":"::1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":-260,"outErrorMsg":"Data is Already Present"}},"msg":"Audit event"}
-{"level":30,"time":1792841935807,"pid":19404,"hostname":"DESKTOP-N4U5EV1","audit":{"ts":"2026-10-24T11:38:55.807Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"admin","status":"SUCCESS","requestMeta":{"ip":"::1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Inserted Successfully"}},"msg":"Audit event"}
-{"level":30,"time":1792842253500,"pid":19404,"hostname":"DESKTOP-N4U5EV1","audit":{"ts":"2026-10-24T11:44:13.500Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"VVCMCIT","status":"SUCCESS","requestMeta":{"ip":"::1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Inserted Successfully"}},"msg":"Audit event"}
-{"level":30,"time":1792842658538,"pid":19404,"hostname":"DESKTOP-N4U5EV1","audit":{"ts":"2026-10-24T11:50:58.538Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"VVCMCIT","status":"SUCCESS","requestMeta":{"ip":"::1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Inserted Successfully"}},"msg":"Audit event"}
-{"level":30,"time":1792843233011,"pid":19404,"hostname":"DESKTOP-N4U5EV1","audit":{"ts":"2026-10-24T12:00:33.011Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"VVCMCIT","status":"SUCCESS","requestMeta":{"ip":"::1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Deleted Successfully"}},"msg":"Audit event"}
-{"level":30,"time":1792846088402,"pid":19404,"hostname":"DESKTOP-N4U5EV1","audit":{"ts":"2026-10-24T12:48:08.402Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"VVCMCIT","status":"SUCCESS","requestMeta":{"ip":"::1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Updated Successfully"}},"msg":"Audit event"}
-{"level":30,"time":1792846094210,"pid":19404,"hostname":"DESKTOP-N4U5EV1","audit":{"ts":"2026-10-24T12:48:14.210Z","action":"HOSPITAL_REGISTRATION","module":"hospitalMst","actor":"VVCMCIT","status":"SUCCESS","requestMeta":{"ip":"::1","method":"POST","path":"/api/hospitalMst/insertHospital"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Updated Successfully"}},"msg":"Audit event"}
+{"level":30,"time":1792842002164,"pid":22516,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842002192,"pid":22516,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842011631,"pid":21396,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842011682,"pid":21396,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842033890,"pid":17840,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842033908,"pid":17840,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842043206,"pid":9756,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842043246,"pid":9756,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842107803,"pid":8216,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842107848,"pid":8216,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842165299,"pid":13440,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842165320,"pid":13440,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842585647,"pid":3456,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842585685,"pid":3456,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842606210,"pid":12364,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842606243,"pid":12364,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842617948,"pid":7256,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842617975,"pid":7256,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842644123,"pid":6268,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842644161,"pid":6268,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842662834,"pid":3492,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842662899,"pid":3492,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842688597,"pid":19800,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842688645,"pid":19800,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842697859,"pid":16816,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842697897,"pid":16816,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842723999,"pid":13992,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842724068,"pid":13992,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842727496,"pid":23120,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842727532,"pid":23120,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842731843,"pid":19364,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842731874,"pid":19364,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842737822,"pid":22252,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842737906,"pid":22252,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842755005,"pid":6988,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792842755032,"pid":6988,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792842794690,"pid":6988,"hostname":"DESKTOP-P3JAJN9","audit":{"ts":"2026-10-24T11:53:14.246Z","action":"BED_CATEGORY_REGISTRATION","module":"hospitalMst","actor":"admin","status":"SUCCESS","requestMeta":{"ip":"::ffff:127.0.0.1","method":"POST","path":"/api/hospitalMst/insertBedCategory"},"details":{"outErrorCode":9999,"outErrorMsg":"Data Inserted Successfully"}},"msg":"Audit event"}
+{"level":30,"time":1792845945331,"pid":17008,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792845945354,"pid":17008,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792845962721,"pid":3792,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792845962745,"pid":3792,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792845992545,"pid":12144,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792845992576,"pid":12144,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792846006255,"pid":18904,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792846006281,"pid":18904,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792846385175,"pid":8472,"hostname":"DESKTOP-N4U5EV1","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792846385227,"pid":8472,"hostname":"DESKTOP-N4U5EV1","port":5000,"env":"development","msg":"Server started"}

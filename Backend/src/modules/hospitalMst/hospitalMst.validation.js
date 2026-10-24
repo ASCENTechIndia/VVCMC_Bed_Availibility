@@ -26,8 +26,20 @@ const hospitalInsSchema = z.object({
   ipSource: z.string().trim().optional().default('RW'),
 }).passthrough();
 
+const bedCategoryInsSchema = z.object({
+  userId: z.union([z.string(), z.number()]).transform(String).optional().default(''),
+  bedCategoryId: z.coerce.number().int().optional(),
+  ulbId: z.coerce.number().int().positive().optional(),
+  bedCategoryName: z.string().trim().min(1, 'Bed category name is required'),
+  status: z.string().trim().optional().default(''),
+  mode: z.coerce.number().int().optional().default(),
+  ipAddress: z.string().trim().optional().default(''),
+  ipSource: z.string().trim().optional().default('RW'),
+}).passthrough();
+
 module.exports = {
   hospitalListQuerySchema,
   hospitalIdParamSchema,
   hospitalInsSchema,
+  bedCategoryInsSchema,
 };
