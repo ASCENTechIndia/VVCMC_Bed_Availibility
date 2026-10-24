@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useData } from '../../context/DataContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
+import SearchableSelect from '../../components/SearchableSelect.jsx';
 import { formatDateTime, grandTotals } from '../../utils.js';
 
 export default function BedAvailability() {
@@ -8,28 +9,8 @@ export default function BedAvailability() {
   const active = useMemo(() => hospitals.filter((h) => h.active), [hospitals]);
 
   const [selectedId, setSelectedId] = useState(active[0]?.id ?? '');
-  const [q, setQ] = useState('');
-  const [notFound, setNotFound] = useState(false);
 
   const hospital = active.find((h) => h.id === Number(selectedId)) || active[0];
-
-  const onSearch = (e) => {
-    e.preventDefault();
-    const term = q.trim().toLowerCase();
-    if (!term) {
-      setNotFound(false);
-      return;
-    }
-    const hit = active.find(
-      (h) => h.name.toLowerCase().includes(term) || h.area.toLowerCase().includes(term)
-    );
-    if (hit) {
-      setSelectedId(hit.id);
-      setNotFound(false);
-    } else {
-      setNotFound(true);
-    }
-  };
 
   if (!hospital) {
     return (
@@ -42,7 +23,7 @@ export default function BedAvailability() {
     );
   }
 
-  const rows = beds[hospital.id];
+  const rows = beds[hospital.id] || [];
   const totals = grandTotals(rows);
 
   return (
@@ -55,37 +36,21 @@ export default function BedAvailability() {
         VVCMC area.
       </p>
 
-      <form className="card bar" onSubmit={onSearch}>
-        <div>
-          <label htmlFor="hospital">Select Hospital Name / रुग्णालय निवडा</label>
-          <select
-            id="hospital"
-            name="hospital_id"
+      <div className="card bar">
+        <div style={{ flex: 1, minWidth: '280px', maxWidth: '520px' }}>
+          <label htmlFor="hospital-search-select">
+            Select Hospital Name / रुग्णालय निवडा
+          </label>
+          <SearchableSelect
+            id="hospital-search-select"
+            options={active}
             value={hospital.id}
-            onChange={(e) => {
-              setSelectedId(Number(e.target.value));
-              setNotFound(false);
-            }}
-          >
-            {active.map((h) => (
-              <option key={h.id} value={h.id}>{h.name}</option>
-            ))}
-          </select>
-        </div>
-        {/* <div>
-          <label htmlFor="q">Search / शोधा</label>
-          <input
-            type="text"
-            id="q"
-            name="q"
-            placeholder="Hospital or area"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(newId) => setSelectedId(Number(newId))}
+            placeholder="Select Hospital / रुग्णालय निवडा"
+            searchPlaceholder="Search by name, area / नाव किंवा क्षेत्र शोधा..."
           />
-        </div> */}
-        <button className="btn" type="submit">Search</button>
-      </form>
-      {notFound && <p className="note">No hospital found for “{q}”.</p>}
+        </div>
+      </div>
 
       <div className="kpi">
         <div><b>{totals.total}</b><small>Total Beds</small></div>
