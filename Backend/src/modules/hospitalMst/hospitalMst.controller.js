@@ -1,4 +1,4 @@
-const { serviceHospitalList, serviceHospitalById, serviceHospitalIns, serviceBedCategoryList, serviceBedCategoryIns, serviceBedAvailabilityList, serviceBedAvailabilityCounts, serviceHospitalDropdownList } = require('./hospitalMst.service');
+const { serviceHospitalList, serviceHospitalById, serviceHospitalIns, serviceBedCategoryList, serviceBedCategoryIns, serviceBedAvailabilityList, serviceBedAvailabilityCounts, serviceHospitalDropdownList, serviceBedAvailabilityIns } = require('./hospitalMst.service');
 const { auditLog } = require('../../utils/audit-log');
 const { logApiSuccess, logApiError } = require('../../utils/log');
 
@@ -170,6 +170,46 @@ async function getHospitalDropdownList(req, res, next) {
   }
 }
 
+async function insertBedAvailability(req, res, next) {
+  try {
+    const payload = {
+      ...req.body,
+      userId: req.body.userId || '',
+      ipAddress: req.body.ipAddress || '',
+      ipSource: req.body.ipSource || 'RW',
+    };
+
+    const out = await serviceBedAvailabilityIns(payload);
+
+    // console.log("OUT:", out);
+
+    const isSuccess = String(out.errorCode) === "9999";
+
+    if (isSuccess) {
+      logApiSuccess(req, 200, out.message || "Bed Availability Saved Successfully");
+    } else {
+      logApiError(req, 400, out.message, "Bed Availability Save failed");
+    }
+
+    auditLog({
+      action: "BED_AVAILABILITY_REGISTRATION",
+      actor: req.user?.userId || payload.userId || "",
+      module: "hospitalMst",
+      status: isSuccess ? "SUCCESS" : "FAILED",
+      details: {
+        outErrorCode: out.errorCode,
+        outErrorMsg: out.message,
+      },
+      requestMeta: requestMeta(req),
+    });
+
+    return res.ok(out);
+  } catch (error) {
+    logApiError(req, 500, error.message, "Bed Availability Save error");
+    return next(error);
+  }
+}
+
 module.exports = {
   getHospitalList,
   getHospitalById,
@@ -179,4 +219,5 @@ module.exports = {
   getBedAvailabilityList,
   getBedAvailabilityCounts,
   getHospitalDropdownList,
+  insertBedAvailability,
 };

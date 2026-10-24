@@ -1,6 +1,6 @@
 const express = require('express');
 const validate = require('../../middleware/validate.middleware');
-const { hospitalInsSchema, bedCategoryInsSchema } = require('./hospitalMst.validation');
+const { hospitalInsSchema, bedCategoryInsSchema, bedAvailabilityInsSchema } = require('./hospitalMst.validation');
 const {
   getHospitalList,
   getHospitalById,
@@ -10,6 +10,7 @@ const {
   getBedAvailabilityList,
   getBedAvailabilityCounts,
   getHospitalDropdownList,
+  insertBedAvailability,
 } = require('./hospitalMst.controller');
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.post('/insertBedCategory', validate(bedCategoryInsSchema), insertBedCateg
 router.post('/bedAvailabilityList', getBedAvailabilityList);
 router.post('/bedCounts', getBedAvailabilityCounts);
 router.post('/hospitalDropdownList', getHospitalDropdownList);
+router.post('/insertBedAvailability', validate(bedAvailabilityInsSchema), insertBedAvailability);
 
 module.exports = router;

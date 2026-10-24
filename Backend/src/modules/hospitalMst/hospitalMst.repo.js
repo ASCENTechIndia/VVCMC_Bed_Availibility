@@ -310,6 +310,82 @@ async function repoHospitalDropdownList(ulbid) {
   return result.rows || [];
 }
 
+/**
+ * Execute stored procedure AOHA_BEDAVAILABILITY_INS
+ * @param {Object} payload - Bed availability insert/update payload
+ * @returns {Promise<{errorCode: number, message: string}>}
+ */
+async function repoBedAvailabilityIns(payload) {
+  const statement = `
+    BEGIN
+      AOHA_BEDAVAILABILITY_INS(
+        :IN_USERID,
+        :IN_ID,
+        :IN_ULBID,
+        :IN_HOSPITALID,
+        :IN_BEDCATEGORYID,
+        :IN_REGULARTOTAL,
+        :IN_REGULAROCCUPIED,
+        :IN_RESERVEDTOTAL,
+        :IN_RESERVEDOCCUPIED,
+        :IN_CONCESSIONALTOTAL,
+        :IN_CONCESSIONALOCCUPIED,
+        :IN_STATUS,
+        :IN_MODE,
+        :IN_IPADDRESS,
+        :IN_IPSOURCE,
+        :OUT_ERRCODE,
+        :OUT_ERRMSG
+      );
+    END;
+  `;
+
+  const binds = {
+    IN_USERID: payload.userId ? String(payload.userId) : '',
+    IN_ID: Number(payload.bedAvailabilityId ?? 0),
+    IN_ULBID: Number(payload.ulbId ?? payload.ulbid ?? 0),
+    IN_HOSPITALID: Number(payload.hospitalId ?? 0),
+    IN_BEDCATEGORYID: Number(payload.bedCategoryId ?? 0),
+
+    IN_REGULARTOTAL: Number(payload.regularTotal ?? 0),
+    IN_REGULAROCCUPIED: Number(payload.regularOccupied ?? 0),
+
+    IN_RESERVEDTOTAL: Number(payload.reservedTotal ?? 0),
+    IN_RESERVEDOCCUPIED: Number(payload.reservedOccupied ?? 0),
+
+    IN_CONCESSIONALTOTAL: Number(payload.concessionalTotal ?? 0),
+    IN_CONCESSIONALOCCUPIED: Number(payload.concessionalOccupied ?? 0),
+
+    IN_STATUS: payload.status ?? 'Y',
+    IN_MODE: Number(payload.mode ?? 0),
+    IN_IPADDRESS: payload.ipAddress ?? '',
+    IN_IPSOURCE: payload.ipSource ?? payload.IN_IPSOURCE ?? 'RW',
+
+    OUT_ERRCODE: {
+      dir: oracledb.BIND_OUT,
+      type: oracledb.NUMBER,
+    },
+    OUT_ERRMSG: {
+      dir: oracledb.BIND_OUT,
+      type: oracledb.STRING,
+      maxSize: 1000,
+    },
+  };
+
+  const result = await executeProcedure({
+    statement,
+    binds,
+    useTx: false,
+  });
+
+  const out = result.outBinds || {};
+
+  return {
+    errorCode: out.OUT_ERRCODE,
+    message: out.OUT_ERRMSG,
+  };
+}
+
 module.exports = {
   repoHospitalList,
   repoHospitalById,
@@ -319,4 +395,5 @@ module.exports = {
   repoBedAvailabilityList,
   repoBedAvailabilityCounts,
   repoHospitalDropdownList,
+  repoBedAvailabilityIns,
 };
