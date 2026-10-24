@@ -1,7 +1,6 @@
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const pad = (n) => String(n).padStart(2, '0');
 
-/** "24 Oct 2026, 09:30 AM" */
 export function formatDateTime(iso) {
   const d = new Date(iso);
   let h = d.getHours();
@@ -10,7 +9,6 @@ export function formatDateTime(iso) {
   return `${pad(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${pad(h)}:${pad(d.getMinutes())} ${ampm}`;
 }
 
-/** "24 Oct 2026, 09:30" (24-hour, used in the audit log) */
 export function formatDateTime24(iso) {
   const d = new Date(iso);
   return `${pad(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -18,7 +16,6 @@ export function formatDateTime24(iso) {
 
 export const isToday = (iso) => new Date(iso).toDateString() === new Date().toDateString();
 
-/** green / warning (<=20% left) / red (full) / none (no beds) */
 export function availabilityClass(total, available) {
   if (total === 0) return '';
   if (available <= 0) return 'r';
@@ -26,7 +23,6 @@ export function availabilityClass(total, available) {
   return 'g';
 }
 
-/** Totals of one quota column across all categories. */
 export function columnTotals(rows, q) {
   return rows.reduce(
     (acc, row) => {
@@ -49,3 +45,6 @@ export function grandTotals(rows) {
     { total: 0, occupied: 0 }
   );
 }
+
+export { getHostname, getIpAddress, getMacAddress, getSource } from './utils/device.js';
+
