@@ -1,0 +1,6 @@
+{"level":30,"time":1792826985172,"pid":21412,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792826985204,"pid":21412,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792827470506,"pid":17592,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792827470554,"pid":17592,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792827532739,"pid":13448,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792827532784,"pid":13448,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
