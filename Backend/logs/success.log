@@ -1,0 +1,4 @@
+{"level":30,"time":1792838811877,"pid":9364,"hostname":"DESKTOP-P3JAJN9","name":"success","method":"GET","path":"/hospitalList","statusCode":200,"ip":"::ffff:127.0.0.1","responseData":"{\"count\":0}","msg":"Hospital List fetched successfully"}
+{"level":30,"time":1792838822553,"pid":9364,"hostname":"DESKTOP-P3JAJN9","name":"success","method":"GET","path":"/hospitalList","statusCode":200,"ip":"::ffff:127.0.0.1","responseData":"{\"count\":0}","msg":"Hospital List fetched successfully"}
+{"level":30,"time":1792838825594,"pid":9364,"hostname":"DESKTOP-P3JAJN9","name":"success","method":"GET","path":"/hospitalList","statusCode":200,"ip":"::ffff:127.0.0.1","responseData":"{\"count\":0}","msg":"Hospital List fetched successfully"}
+{"level":30,"time":1792838912319,"pid":13440,"hostname":"DESKTOP-P3JAJN9","name":"success","method":"POST","path":"/hospitalList","statusCode":200,"ip":"::ffff:127.0.0.1","responseData":"{\"count\":4}","msg":"Hospital List fetched successfully"}
