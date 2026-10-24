@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { CATEGORIES, QUOTAS, seedState } from '../data/seed.js';
+import { useAuth } from './AuthContext.jsx';
 
 const STORAGE_KEY = 'vvcmc-bed-dashboard:v1';
-const AUTH_KEY = 'vvcmc-bed-dashboard:admin';
 
 const DataContext = createContext(null);
 
@@ -10,8 +10,8 @@ function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch (e) {
-    /* storage unavailable - fall back to seed data */
+  } catch (error) {
+    console.warn('Failed to load state from localStorage:', error);
   }
   return seedState();
 }
@@ -21,31 +21,7 @@ const emptyBeds = () =>
 
 export function DataProvider({ children }) {
   const [state, setState] = useState(loadState);
-  const [isAdmin, setIsAdmin] = useState(() => {
-    try {
-      return sessionStorage.getItem(AUTH_KEY) === '1';
-    } catch (e) {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {
-      /* ignore */
-    }
-  }, [state]);
-
-  const login = useCallback(() => {
-    setIsAdmin(true);
-    try { sessionStorage.setItem(AUTH_KEY, '1'); } catch (e) { /* ignore */ }
-  }, []);
-
-  const logout = useCallback(() => {
-    setIsAdmin(false);
-    try { sessionStorage.removeItem(AUTH_KEY); } catch (e) { /* ignore */ }
-  }, []);
+  const auth = useAuth();
 
   const addHospital = useCallback((data) => {
     let newId;
@@ -122,9 +98,13 @@ export function DataProvider({ children }) {
       hospitals: state.hospitals,
       beds: state.beds,
       history: state.history,
-      isAdmin,
-      login,
-      logout,
+      isAdmin: auth.isAdmin,
+      isAuthenticated: auth.isAuthenticated,
+      currentUser: auth.currentUser,
+      user: auth.user,
+      token: auth.token,
+      login: auth.login,
+      logout: auth.logout,
       addHospital,
       updateHospital,
       toggleHospitalStatus,
@@ -132,7 +112,7 @@ export function DataProvider({ children }) {
       saveCapacity,
       resetData,
     }),
-    [state, isAdmin, login, logout, addHospital, updateHospital, toggleHospitalStatus, saveOccupied, saveCapacity, resetData]
+    [state, auth, addHospital, updateHospital, toggleHospitalStatus, saveOccupied, saveCapacity, resetData]
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

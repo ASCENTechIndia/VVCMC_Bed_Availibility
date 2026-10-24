@@ -1,35 +1,96 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useData } from '../../context/DataContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { API_BASE_URL } from '../../services/apiService.js';
+import { getHostname, getIpAddress, getMacAddress, getSource } from '../../utils/device.js';
 
 const LOGO = 'https://vvcmc.in/wp-content/uploads/2025/01/VVCMC-New-Logo-Marathi-2048x224-1.png';
 
 export default function Login() {
-  const { isAdmin, login } = useData();
+  const { isAuthenticated, sessionExpired, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('MMCDTU');
+  const [password, setPassword] = useState('MMCDTU');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [info, setInfo] = useState('');
+  const [info, setInfo] = useState(() => {
+    return location.state?.expired || sessionExpired
+      ? 'Your session has expired after 15 minutes of inactivity. Please login again.'
+      : '';
+  });
 
-  // If already logged in, redirect to intended target or admin dashboard
-  if (isAdmin) {
+  useEffect(() => {
+    if (location.state?.expired || sessionExpired) {
+      setInfo('Your session has expired after 15 minutes of inactivity. Please login again.');
+    }
+  }, [location.state, sessionExpired]);
+
+  if (isAuthenticated) {
     const destination = location.state?.from || '/dashboard';
     return <Navigate to={destination} replace />;
   }
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    // Demo authentication: any non-empty credentials log in
+    setInfo('');
+
     if (!username.trim() || !password) {
-      setError('Invalid username or password. Please provide both credentials.');
+      setError('Please provide both User ID and password.');
       return;
     }
-    login();
-    const destination = location.state?.from || '/dashboard';
-    navigate(destination, { replace: true });
+
+    try {
+      setLoading(true);
+
+      const [ipaddr, macaddr] = await Promise.all([
+        getIpAddress(),
+        Promise.resolve(getMacAddress()),
+      ]);
+
+      const payload = {
+        userId: username.trim(),
+        password,
+        macaddr,
+        ipaddr,
+        source: getSource(),
+        hostname: getHostname(),
+      };
+
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      let res = null;
+      try {
+        res = await response.json();
+      } catch (err) {
+        console.error('Error parsing login response JSON:', err);
+      }
+
+      if (!response.ok || !res?.success) {
+        throw new Error(res?.message || `Login failed (Status: ${response.status})`);
+      }
+
+      const userData = res?.data?.user || { userId: username.trim() };
+      const authToken = res?.data?.token || '';
+
+      login(userData, authToken);
+
+      const destination = location.state?.from || '/dashboard';
+      navigate(destination, { replace: true });
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err?.message || 'Login failed. Please verify credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,13 +101,14 @@ export default function Login() {
       {error && <div className="alert err">{error}</div>}
       {info && <div className="alert info">{info}</div>}
       <form onSubmit={onSubmit} autoComplete="off">
-        <label htmlFor="u">Username</label>
+        <label htmlFor="u">User ID / Username</label>
         <input
           type="text"
           id="u"
           name="username"
           required
           autoFocus
+          disabled={loading}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -56,10 +118,13 @@ export default function Login() {
           id="p"
           name="password"
           required
+          disabled={loading}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button className="btn full" type="submit">Login</button>
+        <button className="btn full" type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
       </form>
       <p className="sm c">
         <a
