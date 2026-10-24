@@ -78,7 +78,19 @@ export default function Login() {
         throw new Error(res?.message || `Login failed (Status: ${response.status})`);
       }
 
-      const userData = res?.data?.user || { userId: username.trim() };
+      const rawUser = res?.data?.user || { userId: username.trim() };
+      const ulbdValue =
+        rawUser.ulbd ||
+        rawUser.ulbId ||
+        rawUser.orgId ||
+        rawUser.out_OrgId ||
+        rawUser.OUT_ORGID;
+
+      const userData = {
+        ...rawUser,
+        ulbd: ulbdValue,
+        ulbId: ulbdValue,
+      };
       const authToken = res?.data?.token || '';
 
       login(userData, authToken);
