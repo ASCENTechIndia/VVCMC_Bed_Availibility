@@ -211,10 +211,67 @@ async function repoBedCategoryIns(payload) {
   };
 }
 
+/**
+ * Fetch bed availability summary by Hospital ID and ULB ID
+ */
+async function repoBedAvailabilityList(hospitalId, ulbId) {
+  const sql = `
+    SELECT
+        H.VAR_HOSPITAL_NAME AS HOSPITAL_NAME,
+        NVL(B.VAR_BEDCATEGORY_NAME, 'Total') AS BED_CATEGORY,
+     
+        SUM(NVL(A.NUM_REGULAR_TOTAL, 0)) AS REGULAR_TOTAL,
+        SUM(NVL(A.NUM_REGULAR_OCCUPIED, 0)) AS REGULAR_OCCUPIED,
+        SUM(NVL(A.NUM_REGULAR_TOTAL, 0) - NVL(A.NUM_REGULAR_OCCUPIED, 0)) AS REGULAR_AVAILABLE,
+     
+        SUM(NVL(A.NUM_RESERVED_TOTAL, 0)) AS RESERVED_TOTAL,
+        SUM(NVL(A.NUM_RESERVED_OCCUPIED, 0)) AS RESERVED_OCCUPIED,
+        SUM(NVL(A.NUM_RESERVED_TOTAL, 0) - NVL(A.NUM_RESERVED_OCCUPIED, 0)) AS RESERVED_AVAILABLE,
+     
+        SUM(NVL(A.NUM_CONCESSIONAL_TOTAL, 0)) AS CONCESSIONAL_TOTAL,
+        SUM(NVL(A.NUM_CONCESSIONAL_OCCUPIED, 0)) AS CONCESSIONAL_OCCUPIED,
+        SUM(NVL(A.NUM_CONCESSIONAL_TOTAL, 0) - NVL(A.NUM_CONCESSIONAL_OCCUPIED, 0)) AS CONCESSIONAL_AVAILABLE
+     
+    FROM AOHA_BEDCATEGORY_MAS B
+     
+    LEFT JOIN AOHA_BEDAVAILABILITY_MAS A
+        ON A.NUM_BEDAVAILABILITY_BEDCATEGORYID = B.NUM_BEDCATEGORY_ID
+        AND A.NUM_BEDAVAILABILITY_ULBID = B.NUM_BEDCATEGORY_ULBID
+        AND A.NUM_BEDAVAILABILITY_HOSPITALID = :HospitalId
+        AND A.VAR_BEDAVAILABILITY_STATUS = 'Y'
+     
+    LEFT JOIN AOHA_HOSPITAL_MAS H
+        ON H.NUM_HOSPITAL_ID = :HospitalId
+        AND H.NUM_HOSPITAL_ULBID = B.NUM_BEDCATEGORY_ULBID
+     
+    WHERE B.NUM_BEDCATEGORY_ULBID = :ULBID
+        AND B.VAR_BEDCATEGORY_STATUS = 'Y'
+     
+    GROUP BY GROUPING SETS
+    (
+        (H.VAR_HOSPITAL_NAME, B.NUM_BEDCATEGORY_ID, B.VAR_BEDCATEGORY_NAME),
+        (H.VAR_HOSPITAL_NAME)
+    )
+     
+    ORDER BY
+        GROUPING(B.VAR_BEDCATEGORY_NAME),
+        B.NUM_BEDCATEGORY_ID
+  `;
+
+  const binds = {
+    HospitalId: Number(hospitalId || 0),
+    ULBID: Number(ulbId || 0),
+  };
+
+  const result = await executeQuery(sql, binds);
+  return result.rows || [];
+}
+
 module.exports = {
   repoHospitalList,
   repoHospitalById,
   repoHospitalIns,
   repoBedCategoryList,
   repoBedCategoryIns,
+  repoBedAvailabilityList,
 };

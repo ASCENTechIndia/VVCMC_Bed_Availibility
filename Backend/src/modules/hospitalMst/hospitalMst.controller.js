@@ -1,4 +1,4 @@
-const { serviceHospitalList, serviceHospitalById, serviceHospitalIns, serviceBedCategoryList, serviceBedCategoryIns } = require('./hospitalMst.service');
+const { serviceHospitalList, serviceHospitalById, serviceHospitalIns, serviceBedCategoryList, serviceBedCategoryIns, serviceBedAvailabilityList } = require('./hospitalMst.service');
 const { auditLog } = require('../../utils/audit-log');
 const { logApiSuccess, logApiError } = require('../../utils/log');
 
@@ -133,10 +133,24 @@ async function insertBedCategory(req, res, next) {
   }
 }
 
+async function getBedAvailabilityList(req, res, next) {
+  try {
+    const hospitalId = req.body.hospitalId || 0;
+    const ulbId = req.body.ulbId || req.body.ulbid || 0;
+    const rows = await serviceBedAvailabilityList(hospitalId, ulbId);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Bed Availability List fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'Bed Availability List fetch error');
+    return next(error);
+  }
+}
+
 module.exports = {
   getHospitalList,
   getHospitalById,
   insertHospital,
   getBedCategoryList,
   insertBedCategory,
+  getBedAvailabilityList,
 };
