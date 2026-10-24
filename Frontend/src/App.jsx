@@ -20,31 +20,35 @@ export default function App() {
     <Routes>
       {/* Public citizen page */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<BedAvailability />} />
+        <Route path="/citizendashboard" element={<BedAvailability />} />
       </Route>
 
-      {/* Admin module */}
-      <Route path="/admin" element={<AdminRoot />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        
+      {/* Admin and Auth Module */}
+      <Route element={<AdminRoot />}>
+        {/* Main entry redirects to /login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Auth routes: single login & logout */}
         <Route element={<AuthLayout />}>
-          <Route path="login" element={<Login />} />
-          <Route path="logout" element={<Logout />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Logout />} />
         </Route>
 
+        {/* Protected Admin Module - normal paths */}
         <Route element={<AdminLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="select-hospital" element={<SelectHospital />} />
-          <Route path="bed-update" element={<BedForm mode="update" />} />
-          <Route path="bed-capacity" element={<BedForm mode="capacity" />} />
-          <Route path="hospitals" element={<HospitalList />} />
-          <Route path="hospitals/add" element={<HospitalForm mode="add" />} />
-          <Route path="hospitals/edit" element={<HospitalForm mode="edit" />} />
-          <Route path="update-history" element={<UpdateHistory />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/select-hospital" element={<SelectHospital />} />
+          <Route path="/bed-update" element={<BedForm mode="update" />} />
+          <Route path="/bed-capacity" element={<BedForm mode="capacity" />} />
+          <Route path="/hospitals" element={<HospitalList />} />
+          <Route path="/hospitals/add" element={<HospitalForm mode="add" />} />
+          <Route path="/hospitals/edit" element={<HospitalForm mode="edit" />} />
+          <Route path="/update-history" element={<UpdateHistory />} />
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Catch-all redirect to /login */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

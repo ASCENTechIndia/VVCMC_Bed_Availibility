@@ -12,7 +12,7 @@ export default function HospitalForm({ mode }) {
   const isEdit = mode === 'edit';
   const existing = isEdit ? hospitals.find((h) => h.id === Number(params.get('id'))) : null;
 
-  if (isEdit && !existing) return <Navigate to="/admin/hospitals" replace />;
+  if (isEdit && !existing) return <Navigate to="/hospitals" replace />;
   return <HospitalFormInner key={existing?.id ?? 'new'} isEdit={isEdit} initial={existing || EMPTY} />;
 }
 
@@ -44,7 +44,7 @@ function HospitalFormInner({ isEdit, initial }) {
       setSaved(true);
     } else {
       const newId = addHospital(data);
-      navigate(`/admin/bed-capacity?hospital_id=${newId}`);
+      navigate(`/bed-capacity?hospital_id=${newId}`);
     }
   };
 
@@ -52,7 +52,7 @@ function HospitalFormInner({ isEdit, initial }) {
     <>
       <div className="ph">
         <h1>{isEdit ? 'Update Hospital' : 'Add New Hospital'}</h1>
-        <Link className="btn" to="/admin/hospitals">&laquo; Back to list</Link>
+        <Link className="btn" to="/hospitals">&laquo; Back to list</Link>
       </div>
       {saved && <div className="alert ok">Hospital updated successfully.</div>}
       <form className="card" onSubmit={onSubmit} onReset={(e) => { e.preventDefault(); setForm(initial); }}>

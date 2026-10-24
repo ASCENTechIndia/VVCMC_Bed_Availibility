@@ -26,7 +26,7 @@ export default function PublicLayout() {
         <a href="https://vvcmc.in/vasai-virar-city/">वसई विरार</a>
         <a href="#">विभाग</a>
         <a href="#">कार्यालयीन कामकाज</a>
-        <Link to="/" className="on">शहरातील सुविधा</Link>
+        <Link to="/citizendashboard" className="on">शहरातील सुविधा</Link>
         <a href="https://vvcmc.in/important-contact/">आपत्ती व्यवस्थापन संपर्क</a>
         <a href="https://vvcmc.in/contacts/">संपर्क</a>
       </nav>

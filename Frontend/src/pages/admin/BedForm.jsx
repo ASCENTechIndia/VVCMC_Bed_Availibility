@@ -16,7 +16,7 @@ export default function BedForm({ mode }) {
   const { hospitals, beds, saveOccupied, saveCapacity } = useData();
   const hospital = hospitals.find((h) => h.id === id);
 
-  if (!hospital) return <Navigate to="/admin/select-hospital" replace />;
+  if (!hospital) return <Navigate to="/select-hospital" replace />;
   // key forces a fresh draft when the hospital changes
   return <BedFormInner key={id} mode={mode} hospital={hospital} stored={beds[id]} onSave={mode === 'update' ? saveOccupied : saveCapacity} />;
 }
@@ -53,7 +53,7 @@ function BedFormInner({ mode, hospital, stored, onSave }) {
     <>
       <div className="ph">
         <h1>{isUpdate ? 'Daily Bed Status Update' : 'Bed Capacity Setup'}</h1>
-        <Link className="btn" to="/admin/select-hospital">&laquo; Change hospital</Link>
+        <Link className="btn" to="/select-hospital">&laquo; Change hospital</Link>
       </div>
       <div className="card">
         <b>Hospital:</b> {hospital.name} &nbsp;|&nbsp; <b>Last updated:</b> {formatDateTime(hospital.lastUpdated)} by{' '}
@@ -71,7 +71,7 @@ function BedFormInner({ mode, hospital, stored, onSave }) {
         <BedTable rows={rows} mode={mode} onChange={onChange} />
         <p className="actions">
           <button className="btn y" type="submit">{isUpdate ? 'Save / Submit' : 'Save Capacity'}</button>{' '}
-          <Link className="btn g2" to="/admin/select-hospital">Cancel</Link>
+          <Link className="btn g2" to="/select-hospital">Cancel</Link>
         </p>
         <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
       </form>

@@ -20,7 +20,7 @@ export default function SelectHospital() {
     <>
       <h1>Update Bed Status</h1>
       <p className="sm">Select a hospital, then choose what to update.</p>
-      <form className="card" onSubmit={go('/admin/bed-update')}>
+      <form className="card" onSubmit={go('/bed-update')}>
         <div className="form one">
           <div>
             <label htmlFor="h">Select Hospital *</label>
@@ -34,7 +34,7 @@ export default function SelectHospital() {
         </div>
         <p className="actions">
           <button className="btn y" type="submit">Update Daily Bed Status</button>{' '}
-          <button className="btn" type="button" onClick={go('/admin/bed-capacity')}>
+          <button className="btn" type="button" onClick={go('/bed-capacity')}>
             Set Bed Capacity (Total Beds)
           </button>
         </p>
