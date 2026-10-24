@@ -1,0 +1,3 @@
+{"level":50,"time":1792827283596,"pid":21412,"hostname":"DESKTOP-P3JAJN9","name":"error","method":"GET","path":"/health","ip":"::ffff:127.0.0.1","msg":"Route not found: /health"}
+{"level":50,"time":1792827625106,"pid":13448,"hostname":"DESKTOP-P3JAJN9","name":"error","method":"POST","path":"/api/login","ip":"::ffff:127.0.0.1","msg":"Route not found: /api/login"}
+{"level":50,"time":1792827641904,"pid":13448,"hostname":"DESKTOP-P3JAJN9","name":"error","method":"POST","path":"/login","statusCode":401,"ip":"::ffff:127.0.0.1","error":"Invaild Password","msg":"Login failed for user: DMCDTU"}
