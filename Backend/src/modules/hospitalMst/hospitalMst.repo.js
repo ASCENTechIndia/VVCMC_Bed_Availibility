@@ -290,6 +290,7 @@ async function repoBedAvailabilityCounts(ulbid) {
     FROM AOHA_BEDAVAILABILITY_MAS
     WHERE NUM_BEDAVAILABILITY_ULBID = :ulbid
   `;
+    const binds = { ulbid: Number(ulbid || 0) };
   const result = await executeQuery(sql, binds);
   return result.rows || [];
 }
