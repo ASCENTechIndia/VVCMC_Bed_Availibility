@@ -1,4 +1,6 @@
+const oracledb = require('oracledb');
 const { executeQuery } = require('../../db/queryExecutor');
+const { executeProcedure } = require('../../db/procedureExecutor');
 
 /**
  * Fetch hospital master list by ULB ID
@@ -59,7 +61,78 @@ async function repoHospitalById(hospitalId, ulbId ) {
   return result.rows?.[0] || null;
 }
 
+/**
+ * Execute stored procedure AOHA_HOSPITAL_INS
+ * @param {Object} payload - Hospital insert/update payload
+ * @returns {Promise<{errorCode: number, message: string}>}
+ */
+async function repoHospitalIns(payload) {
+  const statement = `
+    BEGIN
+      AOHA_HOSPITAL_INS(
+        :IN_USERID,
+        :IN_ID,
+        :IN_ULBID,
+        :IN_HOSPITALNAME,
+        :IN_HOSPITALTYPE,
+        :IN_ADDRESS,
+        :IN_AREAWARD,
+        :IN_PINCODE,
+        :IN_PHONE,
+        :IN_EMAIL,
+        :IN_STATUS,
+        :IN_MODE,
+        :IN_IPADDRESS,
+        :IN_IPSOURCE,
+        :OUT_ERRCODE,
+        :OUT_ERRMSG
+      );
+    END;
+  `;
+
+  const binds = {
+    IN_USERID: payload.userId ? String(payload.userId) :  '',
+    IN_ID: Number(payload.hospitalId),
+    IN_ULBID: Number(payload.ulbId),
+    IN_HOSPITALNAME: payload.hospitalName,
+    IN_HOSPITALTYPE: payload.hospitalType,
+    IN_ADDRESS: payload.address,
+    IN_AREAWARD: payload.areaWard,
+    IN_PINCODE: payload.pincode ,
+    IN_PHONE: payload.phone,
+    IN_EMAIL: payload.email,
+    IN_STATUS: payload.status,
+    IN_MODE: payload.mode,
+    IN_IPADDRESS: payload.ipAddress,
+    IN_IPSOURCE: payload.ipSource ?? payload.IN_IPSOURCE ?? 'W',
+
+    OUT_ERRCODE: {
+      dir: oracledb.BIND_OUT,
+      type: oracledb.NUMBER,
+    },
+    OUT_ERRMSG: {
+      dir: oracledb.BIND_OUT,
+      type: oracledb.STRING,
+      maxSize: 1000,
+    },
+  };
+
+  const result = await executeProcedure({
+    statement,
+    binds,
+    useTx: false,
+  });
+
+  const out = result.outBinds || {};
+
+  return {
+    errorCode: out.OUT_ERRCODE,
+    message: out.OUT_ERRMSG,
+  };
+}
+
 module.exports = {
   repoHospitalList,
   repoHospitalById,
+  repoHospitalIns,
 };

@@ -1,5 +1,14 @@
-const { serviceHospitalList, serviceHospitalById } = require('./hospitalMst.service');
+const { serviceHospitalList, serviceHospitalById, serviceHospitalIns } = require('./hospitalMst.service');
+const { auditLog } = require('../../utils/audit-log');
 const { logApiSuccess, logApiError } = require('../../utils/log');
+
+function requestMeta(req) {
+  return {
+    ip: req.ip,
+    method: req.method,
+    path: req.originalUrl,
+  };
+}
 
 async function getHospitalList(req, res, next) {
   try {
@@ -32,7 +41,48 @@ async function getHospitalById(req, res, next) {
   }
 }
 
+async function insertHospital(req, res, next) {
+  try {
+    const payload = {
+      ...req.body,
+      userId: req.body.userId || '',
+      ipAddress: req.body.ipAddress || '',
+      ipSource: req.body.ipSource || 'RW',
+    };
+
+    const out = await serviceHospitalIns(payload);
+
+    // console.log("OUT:", out);
+
+    const isSuccess = String(out.errorCode) === "9999";
+
+    if (isSuccess) {
+      logApiSuccess(req, 200, out.message || "Hospital Saved Successfully");
+    } else {
+      logApiError(req, 400, out.message, "Hospital Save failed");
+    }
+
+    auditLog({
+      action: "HOSPITAL_REGISTRATION",
+      actor: req.user?.userId || payload.userId || "",
+      module: "hospitalMst",
+      status: isSuccess ? "SUCCESS" : "FAILED",
+      details: {
+        outErrorCode: out.errorCode,
+        outErrorMsg: out.message,
+      },
+      requestMeta: requestMeta(req),
+    });
+
+    return res.ok(out);
+  } catch (error) {
+    logApiError(req, 500, error.message, "Hospital Save error");
+    return next(error);
+  }
+}
+
 module.exports = {
   getHospitalList,
   getHospitalById,
+  insertHospital,
 };

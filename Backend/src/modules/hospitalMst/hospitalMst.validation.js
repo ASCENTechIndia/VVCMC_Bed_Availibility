@@ -9,7 +9,25 @@ const hospitalIdParamSchema = z.object({
   ulbId: z.coerce.number().int().positive().optional(),
 });
 
+const hospitalInsSchema = z.object({
+  userId: z.union([z.string(), z.number()]).transform(String).optional().default(''),
+  hospitalId: z.coerce.number().int().optional(),
+  ulbId: z.coerce.number().int().positive().optional().default(),
+  hospitalName: z.string().trim().min(1, 'Hospital name is required'),
+  hospitalType: z.string().trim().optional().default(''),
+  address: z.string().trim().optional().default(''),
+  areaWard: z.string().trim().optional().default(''),
+  pincode: z.union([z.string(), z.number()]).transform(String).optional().default(''),
+  phone: z.union([z.string(), z.number()]).transform(String).optional().default(''),
+  email: z.string().trim().optional().default(''),
+  status: z.string().trim().optional().default('Y'),
+  mode: z.coerce.number().int().optional().default(1),
+  ipAddress: z.string().trim().optional().default(''),
+  ipSource: z.string().trim().optional().default('RW'),
+}).passthrough();
+
 module.exports = {
   hospitalListQuerySchema,
   hospitalIdParamSchema,
+  hospitalInsSchema,
 };
