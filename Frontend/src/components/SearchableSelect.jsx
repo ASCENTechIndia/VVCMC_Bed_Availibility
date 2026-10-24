@@ -9,8 +9,8 @@ export default function SearchableSelect({
   onChange,
   placeholder = 'Select Hospital / रुग्णालय निवडा',
   searchPlaceholder = 'Search by name or area / शोधा...',
-  labelKey = 'name',
-  valueKey = 'id',
+  labelKey = 'label',
+  valueKey = 'value',
   id = 'searchable-select',
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,22 +21,38 @@ export default function SearchableSelect({
   const searchInputRef = useRef(null);
   const optionsListRef = useRef(null);
 
+  // Helper to extract option label
+  const getOptLabel = (opt) => {
+    if (!opt) return '';
+    return opt[labelKey] ?? opt.label ?? opt.VAR_HOSPITAL_NAME ?? opt.name ?? '';
+  };
+
+  // Helper to extract option value
+  const getOptValue = (opt) => {
+    if (!opt) return '';
+    return opt[valueKey] !== undefined
+      ? opt[valueKey]
+      : opt.value !== undefined
+        ? opt.value
+        : (opt.NUM_HOSPITAL_ID ?? opt.id ?? '');
+  };
+
   // Find currently selected option
   const selectedOption = useMemo(() => {
-    return options.find((opt) => String(opt[valueKey]) === String(value)) || null;
-  }, [options, value, valueKey]);
+    return options.find((opt) => String(getOptValue(opt)) === String(value)) || null;
+  }, [options, value, valueKey, labelKey]);
 
   // Filter options based on search query
   const filteredOptions = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
     if (!term) return options;
     return options.filter((opt) => {
-      const label = String(opt[labelKey] || '').toLowerCase();
+      const label = String(getOptLabel(opt) || '').toLowerCase();
       const area = String(opt.area || opt.VAR_HOSPITAL_AREA_WARD || '').toLowerCase();
       const type = String(opt.type || opt.VAR_HOSPITAL_TYPE || '').toLowerCase();
       return label.includes(term) || area.includes(term) || type.includes(term);
     });
-  }, [options, searchTerm, labelKey]);
+  }, [options, searchTerm, labelKey, valueKey]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -82,7 +98,7 @@ export default function SearchableSelect({
 
   const handleSelectOption = (opt) => {
     if (onChange) {
-      onChange(opt[valueKey], opt);
+      onChange(getOptValue(opt), opt);
     }
     setIsOpen(false);
   };
@@ -130,7 +146,7 @@ export default function SearchableSelect({
         aria-haspopup="listbox"
       >
         <span className="searchable-select-val">
-          {selectedOption ? selectedOption[labelKey] : placeholder}
+          {selectedOption ? getOptLabel(selectedOption) : placeholder}
         </span>
         <svg
           className={`searchable-select-chevron ${isOpen ? 'rotated' : ''}`}
@@ -199,14 +215,16 @@ export default function SearchableSelect({
             role="listbox"
           >
             {filteredOptions.map((opt, idx) => {
-              const isSelected = String(opt[valueKey]) === String(value);
+              const optVal = getOptValue(opt);
+              const optLabel = getOptLabel(opt);
+              const isSelected = String(optVal) === String(value);
               const isHighlighted = idx === highlightedIndex;
               const area = opt.area || opt.VAR_HOSPITAL_AREA_WARD;
               const type = opt.type || opt.VAR_HOSPITAL_TYPE;
 
               return (
                 <li
-                  key={opt[valueKey]}
+                  key={optVal || idx}
                   className={`searchable-select-option ${
                     isSelected ? 'selected' : ''
                   } ${isHighlighted ? 'highlighted' : ''}`}
@@ -216,7 +234,7 @@ export default function SearchableSelect({
                   aria-selected={isSelected}
                 >
                   <div className="searchable-select-opt-title">
-                    {opt[labelKey]}
+                    {optLabel}
                   </div>
                   {(area || type) && (
                     <div className="searchable-select-opt-meta">
