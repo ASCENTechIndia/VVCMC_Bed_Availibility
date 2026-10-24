@@ -77,3 +77,6 @@
 {"level":30,"time":1792847540330,"pid":16220,"hostname":"DESKTOP-P3JAJN9","audit":{"ts":"2026-10-24T13:12:20.330Z","action":"BED_AVAILABILITY_REGISTRATION","module":"hospitalMst","actor":"admin","status":"FAILED","requestMeta":{"ip":"::ffff:127.0.0.1","method":"POST","path":"/api/hospitalMst/insertBedAvailability"},"details":{"outErrorCode":-290,"outErrorMsg":"Data is Already Present"}},"msg":"Audit event"}
 {"level":30,"time":1792847566806,"pid":13040,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
 {"level":30,"time":1792847566828,"pid":13040,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
+{"level":30,"time":1792847628925,"pid":13040,"hostname":"DESKTOP-P3JAJN9","audit":{"ts":"2026-10-24T13:13:48.925Z","action":"BED_AVAILABILITY_REGISTRATION","module":"hospitalMst","actor":"admin","status":"FAILED","requestMeta":{"ip":"::ffff:127.0.0.1","method":"POST","path":"/api/hospitalMst/insertBedAvailability"},"details":{"outErrorCode":-290,"outErrorMsg":"Data is Already Present"}},"msg":"Audit event"}
+{"level":30,"time":1792847854787,"pid":8252,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1792847854838,"pid":8252,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
