@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useData } from '../../context/DataContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function Logout() {
-  const { logout } = useData();
+  const { logout } = useAuth();
 
   useEffect(() => {
     logout();

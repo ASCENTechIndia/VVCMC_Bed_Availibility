@@ -1,5 +1,5 @@
 import { Link, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useData } from '../context/DataContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const LOGO = 'https://vvcmc.in/wp-content/uploads/2025/01/VVCMC-New-Logo-Marathi-2048x224-1.png';
 
@@ -19,11 +19,13 @@ const MENU = [
 ];
 
 export default function AdminLayout() {
-  const { isAdmin, logout } = useData();
+  const { isAuthenticated, sessionExpired, user, logout } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  if (!isAdmin) return <Navigate to="/login" replace state={{ from: pathname }} />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: pathname, expired: sessionExpired }} />;
+  }
 
   const doLogout = (e) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ export default function AdminLayout() {
           Hospital Bed Dashboard - Admin Panel
           <br />
           <small>
-            Logged in as: Admin User (Super Admin) |{' '}
+            Logged in as: {user?.userFullName || user?.userId || 'Admin User'} |{' '}
             <a href="/logout" onClick={doLogout}>Logout</a>
           </small>
         </div>
