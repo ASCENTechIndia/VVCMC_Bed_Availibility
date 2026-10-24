@@ -8,6 +8,8 @@ const {
   getBedCategoryList,
   insertBedCategory,
   getBedAvailabilityList,
+  getBedAvailabilityCounts,
+  getHospitalDropdownList,
 } = require('./hospitalMst.controller');
 
 const router = express.Router();
@@ -18,5 +20,7 @@ router.post('/insertHospital', validate(hospitalInsSchema), insertHospital);
 router.post('/bedCategoryList', getBedCategoryList);
 router.post('/insertBedCategory', validate(bedCategoryInsSchema), insertBedCategory);
 router.post('/bedAvailabilityList', getBedAvailabilityList);
+router.post('/bedCounts', getBedAvailabilityCounts);
+router.post('/hospitalDropdownList', getHospitalDropdownList);
 
 module.exports = router;

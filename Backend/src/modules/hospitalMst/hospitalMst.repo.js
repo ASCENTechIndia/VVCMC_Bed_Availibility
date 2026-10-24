@@ -267,6 +267,49 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
   return result.rows || [];
 }
 
+/**
+ * Fetch total, occupied, and available bed counts by ULB ID
+ */
+async function repoBedAvailabilityCounts(ulbid) {
+  const sql = `
+    SELECT
+        SUM(NVL(NUM_REGULAR_TOTAL, 0)
+            + NVL(NUM_RESERVED_TOTAL, 0)
+            + NVL(NUM_CONCESSIONAL_TOTAL, 0)) AS TOTAL_BEDS,
+     
+        SUM(NVL(NUM_REGULAR_OCCUPIED, 0)
+            + NVL(NUM_RESERVED_OCCUPIED, 0)
+            + NVL(NUM_CONCESSIONAL_OCCUPIED, 0)) AS OCCUPIED_BEDS,
+     
+        SUM(
+            (NVL(NUM_REGULAR_TOTAL, 0) - NVL(NUM_REGULAR_OCCUPIED, 0))
+            + (NVL(NUM_RESERVED_TOTAL, 0) - NVL(NUM_RESERVED_OCCUPIED, 0))
+            + (NVL(NUM_CONCESSIONAL_TOTAL, 0) - NVL(NUM_CONCESSIONAL_OCCUPIED, 0))
+        ) AS AVAILABLE_BEDS
+     
+    FROM AOHA_BEDAVAILABILITY_MAS
+    WHERE NUM_BEDAVAILABILITY_ULBID = :ulbid
+  `;
+  const result = await executeQuery(sql, binds);
+  return result.rows || [];
+}
+
+/**
+ * Fetch hospital dropdown list (ID and Name) by ULB ID
+ */
+async function repoHospitalDropdownList(ulbid) {
+  const sql = `
+    SELECT a.num_hospital_id,
+           a.var_hospital_name
+      FROM aoha_hospital_mas a
+     WHERE a.num_hospital_ulbid = :ulbid
+     ORDER BY a.var_hospital_name ASC
+  `;
+  const binds = { ulbid: Number(ulbid || 0) };
+  const result = await executeQuery(sql, binds);
+  return result.rows || [];
+}
+
 module.exports = {
   repoHospitalList,
   repoHospitalById,
@@ -274,4 +317,6 @@ module.exports = {
   repoBedCategoryList,
   repoBedCategoryIns,
   repoBedAvailabilityList,
+  repoBedAvailabilityCounts,
+  repoHospitalDropdownList,
 };
