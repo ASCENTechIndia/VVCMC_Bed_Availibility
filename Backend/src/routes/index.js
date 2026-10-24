@@ -14,6 +14,7 @@ router.get('/ready', (req, res) => {
 
 router.use('/auth', authRoutes);
 router.use('/authComplaint', authComplaintRoutes);
-router.use('/registerComplaint',require('../modules/registerComplaint/registerComplaint.routes'));
+router.use('/registerComplaint', require('../modules/registerComplaint/registerComplaint.routes'));
+router.use('/hospitalMst', require('../modules/hospitalMst/hospitalMst.routes'));
 
 module.exports = router;
