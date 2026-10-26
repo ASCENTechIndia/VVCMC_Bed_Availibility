@@ -1,0 +1,2 @@
+{"level":50,"time":1792991218101,"pid":20068,"hostname":"DESKTOP-P3JAJN9","name":"error","method":"POST","path":"/insertBedAvailability","statusCode":400,"ip":"::1","error":"Data is Already Present","msg":"Bed Availability Save failed"}
+{"level":50,"time":1792991243857,"pid":20068,"hostname":"DESKTOP-P3JAJN9","name":"error","method":"POST","path":"/insertBedAvailability","statusCode":400,"ip":"::1","error":"Bed Availability Record Not Found","msg":"Bed Availability Save failed"}
