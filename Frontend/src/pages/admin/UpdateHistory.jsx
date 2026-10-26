@@ -134,7 +134,7 @@ export default function UpdateHistory() {
       setHistoryList(raw);
     } catch (err) {
       console.error('Failed to load bed availability history:', err);
-      setHistoryError(err?.message || 'Failed to load update history');
+      setHistoryError(err?.message || 'Failed to load activity logs');
     } finally {
       setLoadingHistory(false);
     }
@@ -202,7 +202,7 @@ export default function UpdateHistory() {
     <>
       <div className="ph">
         <div>
-          <h1>Update History / Audit Log</h1>
+          <h1>Activity Log</h1>
           <p className="sm">Track all bed status updates and changes across hospitals.</p>
         </div>
         <button
@@ -341,7 +341,7 @@ export default function UpdateHistory() {
             {loadingHistory ? (
               <tr>
                 <td colSpan="6" style={{ textAlign: 'center', padding: '24px' }}>
-                  Loading update history...
+                  Loading activity logs...
                 </td>
               </tr>
             ) : (
@@ -359,7 +359,7 @@ export default function UpdateHistory() {
             {!loadingHistory && shown.length === 0 && (
               <tr>
                 <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                  No update history records found.
+                  No activity logs found.
                 </td>
               </tr>
             )}
