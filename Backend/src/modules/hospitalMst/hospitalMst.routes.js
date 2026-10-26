@@ -12,6 +12,8 @@ const {
   getHospitalDropdownList,
   insertBedAvailability,
   getHospitalBedSummary,
+  getBedAvailabilityLog,
+  getUserDropdownList,
 } = require('./hospitalMst.controller');
 
 const router = express.Router();
@@ -26,6 +28,9 @@ router.post('/bedCounts', getBedAvailabilityCounts);
 router.post('/hospitalDropdownList', getHospitalDropdownList);
 router.post('/insertBedAvailability', validate(bedAvailabilityInsSchema), insertBedAvailability);
 router.post('/hospitalBedSummary', getHospitalBedSummary);
-
+router.post('/bedAvailabilityHistory', getBedAvailabilityLog);
+router.post('/userDropdownList', getUserDropdownList);
 
 module.exports = router;
+
+

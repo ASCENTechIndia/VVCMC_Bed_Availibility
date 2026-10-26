@@ -450,6 +450,119 @@ async function repoHospitalBedSummary(hospitalId, ulbId) {
   return result.rows || [];
 }
 
+function formatDateToDDMMYYYY(val) {
+  if (!val || typeof val !== 'string') return null;
+  const str = val.trim();
+  if (!str) return null;
+
+  if (/^\d{1,2}[\/-]\d{1,2}[\/-]\d{4}$/.test(str)) {
+    const parts = str.split(/[\/-]/);
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2];
+    return `${day}/${month}/${year}`;
+  }
+
+  if (/^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}$/.test(str)) {
+    const parts = str.split(/[\/-]/);
+    const year = parts[0];
+    const month = parts[1].padStart(2, '0');
+    const day = parts[2].padStart(2, '0');
+    return `${day}/${month}/${year}`;
+  }
+
+  return str;
+}
+
+/**
+ * Fetch bed availability update history/audit log
+ * @param {Object} filters
+ * @param {number|null} filters.hospitalId
+ * @param {string|null} filters.fromDate
+ * @param {string|null} filters.toDate
+ * @param {string|null} filters.userId
+ * @param {number} filters.ulbId
+ */
+async function repoBedAvailabilityLog({ hospitalId, fromDate, toDate, userId, ulbId } = {}) {
+  const sql = `
+    SELECT
+        L.DAT_BEDAVAILABILITY_LOGDT AS ACTIVITY_DATE,
+        H.VAR_HOSPITAL_NAME AS HOSPITAL,
+        B.VAR_BEDCATEGORY_NAME AS CATEGORY,
+        L.NUM_REGULAR_OCCUPIED AS OLD_OCCUPIED,
+        M.NUM_REGULAR_OCCUPIED AS CURRENT_OCCUPIED,
+        L.VAR_BEDAVAILABILITY_LOGUSER AS USER_ID
+    FROM AOHA_BEDAVAILABILITY_MAS_LOG L
+    LEFT JOIN AOHA_HOSPITAL_MAS H
+        ON H.NUM_HOSPITAL_ID = L.NUM_BEDAVAILABILITY_HOSPITALID
+       AND H.NUM_HOSPITAL_ULBID = L.NUM_BEDAVAILABILITY_ULBID
+    LEFT JOIN AOHA_BEDCATEGORY_MAS B
+        ON B.NUM_BEDCATEGORY_ID = L.NUM_BEDAVAILABILITY_BEDCATEGORYID
+       AND B.NUM_BEDCATEGORY_ULBID = L.NUM_BEDAVAILABILITY_ULBID
+    LEFT JOIN AOHA_BEDAVAILABILITY_MAS M
+        ON M.NUM_BEDAVAILABILITY_ID = L.NUM_BEDAVAILABILITY_ID
+       AND M.NUM_BEDAVAILABILITY_ULBID = L.NUM_BEDAVAILABILITY_ULBID
+    WHERE L.NUM_BEDAVAILABILITY_ULBID = :ulbId
+      AND (:HospitalId IS NULL
+           OR :HospitalId = 0
+           OR L.NUM_BEDAVAILABILITY_HOSPITALID = :HospitalId)
+      AND (:FromDate IS NULL
+           OR L.DAT_BEDAVAILABILITY_LOGDT >= TO_DATE(:FromDate, 'DD/MM/YYYY'))
+      AND (:ToDate IS NULL
+           OR L.DAT_BEDAVAILABILITY_LOGDT < TO_DATE(:ToDate, 'DD/MM/YYYY') + 1)
+      AND (:UserId IS NULL
+           OR L.VAR_BEDAVAILABILITY_LOGUSER = :UserId)
+    ORDER BY L.DAT_BEDAVAILABILITY_LOGDT DESC NULLS LAST
+  `;
+
+  const formattedFrom = formatDateToDDMMYYYY(fromDate);
+  const formattedTo = formatDateToDDMMYYYY(toDate);
+  const cleanUserId = (userId && String(userId).trim() !== '' && String(userId).toLowerCase() !== 'all') ? String(userId).trim() : null;
+  const numHospitalId = (hospitalId && Number(hospitalId) > 0) ? Number(hospitalId) : null;
+
+  const binds = {
+    ulbId: Number(ulbId || 790),
+    HospitalId: {
+      val: numHospitalId,
+      type: oracledb.NUMBER,
+    },
+    FromDate: {
+      val: formattedFrom,
+      type: oracledb.STRING,
+    },
+    ToDate: {
+      val: formattedTo,
+      type: oracledb.STRING,
+    },
+    UserId: {
+      val: cleanUserId,
+      type: oracledb.STRING,
+    },
+  };
+
+  const result = await executeQuery(sql, binds);
+  return result.rows || [];
+}
+
+/**
+ * Fetch user dropdown list (User ID and Username) by ULB ID
+ * @param {number} ulbid - ULB ID (defaults to 790)
+ */
+async function repoUserDropdownList(ulbid) {
+  const sql = `
+    SELECT
+        num_user_userid,
+        var_user_username
+    FROM admins.aoma_user_def
+    WHERE num_user_ulbid = :ulbid
+    ORDER BY var_user_username ASC
+  `;
+
+  const binds = { ulbid: Number(ulbid || 790) };
+  const result = await executeQuery(sql, binds);
+  return result.rows || [];
+}
+
 module.exports = {
   repoHospitalList,
   repoHospitalById,
@@ -461,4 +574,8 @@ module.exports = {
   repoHospitalDropdownList,
   repoBedAvailabilityIns,
   repoHospitalBedSummary,
+  repoBedAvailabilityLog,
+  repoUserDropdownList,
 };
+
+
