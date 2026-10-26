@@ -81,14 +81,8 @@ export default function BedTable({
           toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied),
         0
       );
-      const totalReservedGrand = itemRows.reduce(
-        (s, r) => s + toNum(r.RESERVED_TOTAL ?? r.reserved_total),
-        0
-      );
-      const totalConcessionalGrand = itemRows.reduce(
-        (s, r) => s + toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total),
-        0
-      );
+      const totalAvailableGrand = Math.max(0, totalBedsGrand - totalOccupiedGrand);
+      const grandCls = availabilityClass(totalBedsGrand, totalAvailableGrand);
 
       return (
         <div className="sc">
@@ -123,20 +117,11 @@ export default function BedTable({
                   )}
                 </th>
                 <th>
-                  Total 10% Reserved Free Beds
+                  Total Available
                   {showHindi && (
                     <>
                       <br />
-                      १०% राखीव मोफत खाटा
-                    </>
-                  )}
-                </th>
-                <th>
-                  Total 10% Concessional Beds
-                  {showHindi && (
-                    <>
-                      <br />
-                      १०% सवलतीच्या खाटा
+                      एकूण उपलब्ध
                     </>
                   )}
                 </th>
@@ -145,7 +130,7 @@ export default function BedTable({
             <tbody>
               {itemRows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                  <td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
                     No hospital bed records found.
                   </td>
                 </tr>
@@ -163,6 +148,8 @@ export default function BedTable({
 
                   const totalBeds = regT + resT + conT;
                   const totalOccupied = regO + resO + conO;
+                  const totalAvailable = Math.max(0, totalBeds - totalOccupied);
+                  const cls = availabilityClass(totalBeds, totalAvailable);
 
                   return (
                     <tr key={displayName || idx}>
@@ -182,8 +169,7 @@ export default function BedTable({
                       </td>
                       <td><b>{totalBeds}</b></td>
                       <td><b>{totalOccupied}</b></td>
-                      <td>{resT}</td>
-                      <td>{conT}</td>
+                      <td className={cls}><b>{totalAvailable}</b></td>
                     </tr>
                   );
                 })
@@ -194,8 +180,7 @@ export default function BedTable({
                 <td className="l">Total</td>
                 <td><b>{totalBedsGrand}</b></td>
                 <td><b>{totalOccupiedGrand}</b></td>
-                <td><b>{totalReservedGrand}</b></td>
-                <td><b>{totalConcessionalGrand}</b></td>
+                <td className={grandCls}><b>{totalAvailableGrand}</b></td>
               </tr>
             </tfoot>
           </table>

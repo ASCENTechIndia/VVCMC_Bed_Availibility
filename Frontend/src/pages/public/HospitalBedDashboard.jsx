@@ -240,7 +240,9 @@ export default function HospitalBedDashboard() {
       )}
 
       <p className="legend">
-        💡 रुग्णालयाचे तपशीलवार संवर्ग व वॉर्डनिहाय बेड पाहण्यासाठी रुग्णालयाच्या नावावर क्लिक करा. Click on any hospital name to view detailed category breakdown.
+        <span className="g">● Beds available</span> &nbsp; <span className="w">● Few beds left (20% or less)</span>{' '}
+        &nbsp; <span className="r">● Full</span> &nbsp;|&nbsp; Available = Total Beds − Occupied &nbsp;|&nbsp;
+        💡 रुग्णालयाचे तपशीलवार संवर्ग व वॉर्डनिहाय बेड पाहण्यासाठी रुग्णालयाच्या नावावर क्लिक करा.
       </p>
     </main>
   );
