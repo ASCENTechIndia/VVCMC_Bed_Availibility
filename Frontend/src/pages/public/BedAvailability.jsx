@@ -10,7 +10,7 @@ export default function BedAvailability() {
 
   const [hospitalOptions, setHospitalOptions] = useState([]);
   const [loadingHospitals, setLoadingHospitals] = useState(true);
-  const [selectedId, setSelectedId] = useState('');
+  const [selectedId, setSelectedId] = useState(1);
   const [hospitalDetails, setHospitalDetails] = useState(null);
 
   const [bedList, setBedList] = useState([]);
@@ -39,10 +39,17 @@ export default function BedAvailability() {
         VAR_HOSPITAL_NAME: item.VAR_HOSPITAL_NAME,
       }));
 
-      setHospitalOptions([
-        { label: 'All Hospitals / सर्व रुग्णालये', value: '', id: '', name: 'All Hospitals' },
-        ...formatted,
-      ]);
+      setHospitalOptions(formatted);
+
+      if (formatted.length > 0) {
+        setSelectedId((prev) => {
+          const exists = formatted.some((opt) => String(opt.value) === String(prev));
+          if (exists && prev !== '') return prev;
+
+          const hospital = formatted.find((opt) => Number(opt.value) === 1);
+          return hospital ? hospital.value : formatted[0].value;
+        });
+      }
     } catch (err) {
       console.error('Failed to load hospital dropdown options:', err);
     } finally {
@@ -110,38 +117,74 @@ export default function BedAvailability() {
       });
   }, [selectedId, user?.ulbId, user?.ulbd]);
 
+  const toNum = (v) => (v !== undefined && v !== null && v !== '' && !isNaN(Number(v)) ? Number(v) : 0);
+
   // Calculate totals for KPI counters
-  const totalRow = useMemo(() => bedList.find((r) => r.BED_CATEGORY === 'Total'), [bedList]);
+  const totalRow = useMemo(() => {
+    return bedList.find((r) => {
+      const name = String(r.BED_CATEGORY ?? r.bed_category ?? '').trim().toLowerCase();
+      return name === 'total' || name === 'एकूण';
+    });
+  }, [bedList]);
 
   const kpiTotals = useMemo(() => {
     if (totalRow) {
-      const total =
-        (Number(totalRow.REGULAR_TOTAL) || 0) +
-        (Number(totalRow.RESERVED_TOTAL) || 0) +
-        (Number(totalRow.CONCESSIONAL_TOTAL) || 0);
+      const regT = toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total);
+      const regO = toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied);
+      const regA = totalRow.REGULAR_AVAILABLE !== undefined
+        ? toNum(totalRow.REGULAR_AVAILABLE)
+        : (totalRow.regular_available !== undefined ? toNum(totalRow.regular_available) : regT - regO);
 
-      const occupied =
-        (Number(totalRow.REGULAR_OCCUPIED) || 0) +
-        (Number(totalRow.RESERVED_OCCUPIED) || 0) +
-        (Number(totalRow.CONCESSIONAL_OCCUPIED) || 0);
+      const resT = toNum(totalRow.RESERVED_TOTAL ?? totalRow.reserved_total);
+      const resO = toNum(totalRow.RESERVED_OCCUPIED ?? totalRow.reserved_occupied);
+      const resA = totalRow.RESERVED_AVAILABLE !== undefined
+        ? toNum(totalRow.RESERVED_AVAILABLE)
+        : (totalRow.reserved_available !== undefined ? toNum(totalRow.reserved_available) : resT - resO);
 
-      const available =
-        Number(totalRow.REGULAR_AVAILABLE ?? ((Number(totalRow.REGULAR_TOTAL) || 0) - (Number(totalRow.REGULAR_OCCUPIED) || 0))) +
-        Number(totalRow.RESERVED_AVAILABLE ?? ((Number(totalRow.RESERVED_TOTAL) || 0) - (Number(totalRow.RESERVED_OCCUPIED) || 0))) +
-        Number(totalRow.CONCESSIONAL_AVAILABLE ?? ((Number(totalRow.CONCESSIONAL_TOTAL) || 0) - (Number(totalRow.CONCESSIONAL_OCCUPIED) || 0)));
+      const conT = toNum(totalRow.CONCESSIONAL_TOTAL ?? totalRow.concessional_total);
+      const conO = toNum(totalRow.CONCESSIONAL_OCCUPIED ?? totalRow.concessional_occupied);
+      const conA = totalRow.CONCESSIONAL_AVAILABLE !== undefined
+        ? toNum(totalRow.CONCESSIONAL_AVAILABLE)
+        : (totalRow.concessional_available !== undefined ? toNum(totalRow.concessional_available) : conT - conO);
 
-      return { total, occupied, available };
+      return {
+        total: regT + resT + conT,
+        occupied: regO + resO + conO,
+        available: regA + resA + conA,
+      };
     }
 
-    const catRows = bedList.filter((r) => r.BED_CATEGORY !== 'Total');
+    const catRows = bedList.filter((r) => {
+      const name = String(r.BED_CATEGORY ?? r.bed_category ?? '').trim().toLowerCase();
+      return name !== 'total' && name !== 'एकूण';
+    });
+
     if (catRows.length > 0) {
       let total = 0;
       let occupied = 0;
       let available = 0;
       catRows.forEach((r) => {
-        total += (Number(r.REGULAR_TOTAL) || 0) + (Number(r.RESERVED_TOTAL) || 0) + (Number(r.CONCESSIONAL_TOTAL) || 0);
-        occupied += (Number(r.REGULAR_OCCUPIED) || 0) + (Number(r.RESERVED_OCCUPIED) || 0) + (Number(r.CONCESSIONAL_OCCUPIED) || 0);
-        available += (Number(r.REGULAR_AVAILABLE) || 0) + (Number(r.RESERVED_AVAILABLE) || 0) + (Number(r.CONCESSIONAL_AVAILABLE) || 0);
+        const regT = toNum(r.REGULAR_TOTAL ?? r.regular_total);
+        const regO = toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied);
+        const regA = r.REGULAR_AVAILABLE !== undefined
+          ? toNum(r.REGULAR_AVAILABLE)
+          : (r.regular_available !== undefined ? toNum(r.regular_available) : regT - regO);
+
+        const resT = toNum(r.RESERVED_TOTAL ?? r.reserved_total);
+        const resO = toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied);
+        const resA = r.RESERVED_AVAILABLE !== undefined
+          ? toNum(r.RESERVED_AVAILABLE)
+          : (r.reserved_available !== undefined ? toNum(r.reserved_available) : resT - resO);
+
+        const conT = toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total);
+        const conO = toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied);
+        const conA = r.CONCESSIONAL_AVAILABLE !== undefined
+          ? toNum(r.CONCESSIONAL_AVAILABLE)
+          : (r.concessional_available !== undefined ? toNum(r.concessional_available) : conT - conO);
+
+        total += regT + resT + conT;
+        occupied += regO + resO + conO;
+        available += regA + resA + conA;
       });
       return { total, occupied, available };
     }
@@ -157,29 +200,31 @@ export default function BedAvailability() {
   const displayName = isAllHospitals
     ? 'All Hospitals / सर्व रुग्णालये'
     : hospitalDetails?.VAR_HOSPITAL_NAME ||
-      selectedHospital?.label ||
-      selectedHospital?.name ||
-      'Hospital';
+    selectedHospital?.label ||
+    selectedHospital?.name ||
+    bedList[0]?.HOSPITAL_NAME ||
+    bedList[0]?.hospital_name ||
+    'Hospital';
 
   const displayAddress = isAllHospitals
     ? 'Vasai-Virar City Municipal Corporation Area'
     : hospitalDetails?.VAR_HOSPITAL_ADDRESS ||
-      (hospitalDetails?.VAR_HOSPITAL_AREA_WARD ? `Area: ${hospitalDetails.VAR_HOSPITAL_AREA_WARD}` : '') ||
-      selectedHospital?.address ||
-      'VVCMC Area';
+    (hospitalDetails?.VAR_HOSPITAL_AREA_WARD ? `Area: ${hospitalDetails.VAR_HOSPITAL_AREA_WARD}` : '') ||
+    selectedHospital?.address ||
+    'VVCMC Area';
 
   const displayPhone = isAllHospitals
     ? 'VVCMC Helpline / हेल्पलाईन'
     : hospitalDetails?.VAR_HOSPITAL_PHONE ||
-      selectedHospital?.phone ||
-      '-';
+    selectedHospital?.phone ||
+    '-';
 
   const displayUpdated = isAllHospitals
     ? new Date().toISOString()
     : hospitalDetails?.DAT_HOSPITAL_UPDDT ||
-      hospitalDetails?.DAT_HOSPITAL_INSDT ||
-      selectedHospital?.lastUpdated ||
-      new Date().toISOString();
+    hospitalDetails?.DAT_HOSPITAL_INSDT ||
+    selectedHospital?.lastUpdated ||
+    new Date().toISOString();
 
   return (
     <main className="wrap">

@@ -10,8 +10,8 @@ export default function Login() {
   const { isAuthenticated, sessionExpired, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState('MMCDTU');
-  const [password, setPassword] = useState('MMCDTU');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState(() => {
