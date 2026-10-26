@@ -318,22 +318,21 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
         <Link className="btn" to="/select-hospital">&laquo; Change hospital</Link>
       </div>
       <div className="card">
-        <b>Hospital:</b> {hospital.name} &nbsp;|&nbsp; <b>Last updated:</b> {formatDateTime(hospital.lastUpdated)} by{' '}
-        {hospital.updatedBy || 'Admin'}
+        <b>Hospital:</b> {hospital.name} &nbsp;
       </div>
-      <div className="alert info">
+      {/* <div className="alert info">
         {isUpdate ? (
           <>Enter <b>Occupied</b> beds for each category and quota. Total beds are fixed here.</>
         ) : (
           <>Enter <b>Total</b> beds for each category and quota. Use 0 where the hospital has no such beds.</>
         )}
-      </div>
+      </div> */}
       {msg && <div className={`alert ${msg.type}`}>{msg.text}</div>}
       <form onSubmit={onSubmit}>
         <BedTable rows={rows} mode={mode} onChange={onChange} categories={cats} />
         <p className="actions">
           <button className="btn y" type="submit" disabled={saving}>
-            {saving ? 'Saving...' : isUpdate ? 'Save / Submit' : 'Save Capacity'}
+            {saving ? 'Saving...' : isUpdate ? 'Save' : 'Save Capacity'}
           </button>{' '}
           <Link className="btn g2" to="/select-hospital">Cancel</Link>
         </p>

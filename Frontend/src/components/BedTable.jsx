@@ -8,9 +8,23 @@ import { availabilityClass, columnTotals } from '../utils.js';
  *   mode="capacity" - Total is editable (bed capacity setup)
  * rows[category][quota] = { total, occupied }
  */
-export default function BedTable({ rows = [], mode = 'view', onChange, showHindi = false, categories }) {
+export default function BedTable({
+  rows = [],
+  mode = 'view',
+  onChange,
+  showHindi = false,
+  categories,
+  isHospitalView = false,
+  onHospitalClick,
+}) {
   const getCatName = (cat) =>
     cat?.BED_CATEGORY ?? cat?.bed_category ?? cat?.VAR_BEDCATEGORY_NAME ?? cat?.var_bedcategory_name ?? cat?.name ?? '';
+
+  const getHspName = (r) =>
+    r?.HOSPITAL_NAME ?? r?.hospital_name ?? r?.VAR_HOSPITAL_NAME ?? r?.name ?? '';
+
+  const getCatCount = (r) =>
+    toNum(r?.CATEGORY_COUNT ?? r?.category_count ?? r?.BED_CATEGORY_COUNT ?? r?.bed_category_count ?? 0);
 
   const toNum = (val) => {
     if (val === undefined || val === null || val === '') return 0;
@@ -35,24 +49,28 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
 
   if (isApiData) {
     const isTotal = (r) => {
-      const name = String(getCatName(r)).trim().toLowerCase();
+      const name = String(isHospitalView ? getHspName(r) : getCatName(r)).trim().toLowerCase();
       return name === 'total' || name === 'एकूण';
     };
 
-    const categoryRows = rows.filter((r) => !isTotal(r));
+    const itemRows = rows.filter((r) => !isTotal(r));
     const totalRowFromData = rows.find((r) => isTotal(r));
+
+    const totalCategoryCount = itemRows.reduce((s, r) => s + getCatCount(r), 0);
 
     const totalRow = totalRowFromData || {
       BED_CATEGORY: 'Total',
-      REGULAR_TOTAL: categoryRows.reduce((s, r) => s + toNum(r.REGULAR_TOTAL ?? r.regular_total), 0),
-      REGULAR_OCCUPIED: categoryRows.reduce((s, r) => s + toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied), 0),
-      REGULAR_AVAILABLE: categoryRows.reduce((s, r) => s + toNum(r.REGULAR_AVAILABLE ?? r.regular_available ?? (toNum(r.REGULAR_TOTAL ?? r.regular_total) - toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied))), 0),
-      RESERVED_TOTAL: categoryRows.reduce((s, r) => s + toNum(r.RESERVED_TOTAL ?? r.reserved_total), 0),
-      RESERVED_OCCUPIED: categoryRows.reduce((s, r) => s + toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied), 0),
-      RESERVED_AVAILABLE: categoryRows.reduce((s, r) => s + toNum(r.RESERVED_AVAILABLE ?? r.reserved_available ?? (toNum(r.RESERVED_TOTAL ?? r.reserved_total) - toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied))), 0),
-      CONCESSIONAL_TOTAL: categoryRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total), 0),
-      CONCESSIONAL_OCCUPIED: categoryRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied), 0),
-      CONCESSIONAL_AVAILABLE: categoryRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_AVAILABLE ?? r.concessional_available ?? (toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total) - toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied))), 0),
+      HOSPITAL_NAME: 'Total',
+      CATEGORY_COUNT: totalCategoryCount,
+      REGULAR_TOTAL: itemRows.reduce((s, r) => s + toNum(r.REGULAR_TOTAL ?? r.regular_total), 0),
+      REGULAR_OCCUPIED: itemRows.reduce((s, r) => s + toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied), 0),
+      REGULAR_AVAILABLE: itemRows.reduce((s, r) => s + toNum(r.REGULAR_AVAILABLE ?? r.regular_available ?? (toNum(r.REGULAR_TOTAL ?? r.regular_total) - toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied))), 0),
+      RESERVED_TOTAL: itemRows.reduce((s, r) => s + toNum(r.RESERVED_TOTAL ?? r.reserved_total), 0),
+      RESERVED_OCCUPIED: itemRows.reduce((s, r) => s + toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied), 0),
+      RESERVED_AVAILABLE: itemRows.reduce((s, r) => s + toNum(r.RESERVED_AVAILABLE ?? r.reserved_available ?? (toNum(r.RESERVED_TOTAL ?? r.reserved_total) - toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied))), 0),
+      CONCESSIONAL_TOTAL: itemRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total), 0),
+      CONCESSIONAL_OCCUPIED: itemRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied), 0),
+      CONCESSIONAL_AVAILABLE: itemRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_AVAILABLE ?? r.concessional_available ?? (toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total) - toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied))), 0),
     };
 
     return (
@@ -61,14 +79,39 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
           <thead>
             <tr>
               <th rowSpan="2">
-                Bed Category / Ward Type
-                {showHindi && (
+                {isHospitalView ? (
                   <>
-                    <br />
-                    बेड प्रकार
+                    Hospital Name
+                    {showHindi && (
+                      <>
+                        <br />
+                        रुग्णालय नाव
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    Bed Category / Ward Type
+                    {showHindi && (
+                      <>
+                        <br />
+                        बेड प्रकार
+                      </>
+                    )}
                   </>
                 )}
               </th>
+              {isHospitalView && (
+                <th rowSpan="2">
+                  Category Count
+                  {showHindi && (
+                    <>
+                      <br />
+                      कॅटेगरी संख्या
+                    </>
+                  )}
+                </th>
+              )}
               {QUOTAS.map((q) => (
                 <th key={q.id} colSpan="3">{q.label}</th>
               ))}
@@ -80,15 +123,19 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
             </tr>
           </thead>
           <tbody>
-            {categoryRows.length === 0 ? (
+            {itemRows.length === 0 ? (
               <tr>
-                <td colSpan="10" style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
-                  No bed availability records found.
+                <td colSpan={isHospitalView ? 11 : 10} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                  {isHospitalView ? 'No hospital bed records found.' : 'No bed availability records found.'}
                 </td>
               </tr>
             ) : (
-              categoryRows.map((cat, idx) => {
-                const catName = getCatName(cat) || `Category ${idx + 1}`;
+              itemRows.map((cat, idx) => {
+                const displayName = isHospitalView
+                  ? (getHspName(cat) || `Hospital ${idx + 1}`)
+                  : (getCatName(cat) || `Category ${idx + 1}`);
+                const catCount = getCatCount(cat);
+
                 const regTotal = toNum(cat.REGULAR_TOTAL ?? cat.regular_total);
                 const regOcc = toNum(cat.REGULAR_OCCUPIED ?? cat.regular_occupied);
                 const regAvail = cat.REGULAR_AVAILABLE !== undefined
@@ -112,8 +159,22 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
                 const conCls = availabilityClass(conTotal, conAvail);
 
                 return (
-                  <tr key={catName || idx}>
-                    <td className="l">{catName}</td>
+                  <tr key={displayName || idx}>
+                    <td className="l">
+                      {isHospitalView && onHospitalClick ? (
+                        <button
+                          type="button"
+                          className="hsp-link"
+                          onClick={() => onHospitalClick(cat)}
+                          title={`Click to view bed details for ${displayName}`}
+                        >
+                          {displayName}
+                        </button>
+                      ) : (
+                        displayName
+                      )}
+                    </td>
+                    {isHospitalView && <td><b>{catCount}</b></td>}
                     {/* Regular */}
                     <td>{regTotal}</td>
                     <td>{regOcc}</td>
@@ -134,6 +195,7 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
           <tfoot>
             <tr>
               <td className="l">Total</td>
+              {isHospitalView && <td><b>{totalCategoryCount}</b></td>}
               {/* Regular Total */}
               <td>{toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total)}</td>
               <td>{toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied)}</td>
