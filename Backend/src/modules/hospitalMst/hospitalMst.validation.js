@@ -37,9 +37,28 @@ const bedCategoryInsSchema = z.object({
   ipSource: z.string().trim().optional().default('RW'),
 }).passthrough();
 
+const bedAvailabilityInsSchema = z.object({
+  userId: z.union([z.string(), z.number()]).transform(String).optional().default(''),
+  bedAvailabilityId: z.coerce.number().int().optional(),
+  ulbId: z.coerce.number().int().positive().optional(),
+  hospitalId: z.coerce.number().int().positive().optional(),
+  bedCategoryId: z.coerce.number().int().positive().optional(),
+  regularTotal: z.coerce.number().int().min(0).optional().default(0),
+  regularOccupied: z.coerce.number().int().min(0).optional().default(0),
+  reservedTotal: z.coerce.number().int().min(0).optional().default(0),
+  reservedOccupied: z.coerce.number().int().min(0).optional().default(0),
+  concessionalTotal: z.coerce.number().int().min(0).optional().default(0),
+  concessionalOccupied: z.coerce.number().int().min(0).optional().default(0),
+  status: z.string().trim().optional().default('Y'),
+  mode: z.coerce.number().int().optional(),
+  ipAddress: z.string().trim().optional().default(''),
+  ipSource: z.string().trim().optional().default('RW'),
+}).passthrough();
+
 module.exports = {
   hospitalListQuerySchema,
   hospitalIdParamSchema,
   hospitalInsSchema,
   bedCategoryInsSchema,
+  bedAvailabilityInsSchema,
 };

@@ -10,8 +10,8 @@ export default function Login() {
   const { isAuthenticated, sessionExpired, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState('MMCDTU');
-  const [password, setPassword] = useState('MMCDTU');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState(() => {
@@ -139,7 +139,7 @@ export default function Login() {
         </button>
       </form>
       <p className="sm c">
-        <a
+        {/* <a
           href="#forgot"
           onClick={(e) => {
             e.preventDefault();
@@ -147,7 +147,7 @@ export default function Login() {
           }}
         >
           Forgot password?
-        </a>
+        </a> */}
       </p>
       <p className="sm c" style={{ marginTop: '12px' }}>
         <Link to="/citizendashboard">← Citizen Bed Availability Dashboard</Link>

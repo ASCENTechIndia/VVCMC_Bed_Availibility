@@ -1,4 +1,17 @@
-const { serviceHospitalList, serviceHospitalById, serviceHospitalIns, serviceBedCategoryList, serviceBedCategoryIns } = require('./hospitalMst.service');
+const {
+  serviceHospitalList,
+  serviceHospitalById,
+  serviceHospitalIns,
+  serviceBedCategoryList,
+  serviceBedCategoryIns,
+  serviceBedAvailabilityList,
+  serviceBedAvailabilityCounts,
+  serviceHospitalDropdownList,
+  serviceBedAvailabilityIns,
+  serviceHospitalBedSummary,
+  serviceBedAvailabilityLog,
+  serviceUserDropdownList,
+} = require('./hospitalMst.service');
 const { auditLog } = require('../../utils/audit-log');
 const { logApiSuccess, logApiError } = require('../../utils/log');
 
@@ -133,10 +146,141 @@ async function insertBedCategory(req, res, next) {
   }
 }
 
+async function getBedAvailabilityList(req, res, next) {
+  try {
+    const hospitalId = req.body.hospitalId || 0;
+    const ulbId = req.body.ulbId || req.body.ulbid || 0;
+    const rows = await serviceBedAvailabilityList(hospitalId, ulbId);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Bed Availability List fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'Bed Availability List fetch error');
+    return next(error);
+  }
+}
+
+async function getBedAvailabilityCounts(req, res, next) {
+  try {
+    const ulbid = req.body.ulbid || req.body.ulbId || 0;
+    const rows = await serviceBedAvailabilityCounts(ulbid);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Bed Availability Counts fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'Bed Availability Counts fetch error');
+    return next(error);
+  }
+}
+
+async function getHospitalDropdownList(req, res, next) {
+  try {
+    const ulbid = req.body.ulbid || req.body.ulbId || 0;
+    const rows = await serviceHospitalDropdownList(ulbid);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Hospital Dropdown List fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'Hospital Dropdown List fetch error');
+    return next(error);
+  }
+}
+
+async function insertBedAvailability(req, res, next) {
+  try {
+    const payload = {
+      ...req.body,
+      userId: req.body.userId || '',
+      ipAddress: req.body.ipAddress || '',
+      ipSource: req.body.ipSource || 'RW',
+    };
+
+    const out = await serviceBedAvailabilityIns(payload);
+
+    // console.log("OUT:", out);
+
+    const isSuccess = String(out.errorCode) === "9999";
+
+    if (isSuccess) {
+      logApiSuccess(req, 200, out.message || "Bed Availability Saved Successfully");
+    } else {
+      logApiError(req, 400, out.message, "Bed Availability Save failed");
+    }
+
+    auditLog({
+      action: "BED_AVAILABILITY_REGISTRATION",
+      actor: req.user?.userId || payload.userId || "",
+      module: "hospitalMst",
+      status: isSuccess ? "SUCCESS" : "FAILED",
+      details: {
+        outErrorCode: out.errorCode,
+        outErrorMsg: out.message,
+      },
+      requestMeta: requestMeta(req),
+    });
+
+    return res.ok(out);
+  } catch (error) {
+    logApiError(req, 500, error.message, "Bed Availability Save error");
+    return next(error);
+  }
+}
+
+async function getHospitalBedSummary(req, res, next) {
+  try {
+    const hospitalId = req.body?.hospitalId || 0;
+    const ulbId = req.body?.ulbId || 0;
+    const rows = await serviceHospitalBedSummary(hospitalId, ulbId);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Hospital Bed Summary fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'Hospital Bed Summary fetch error');
+    return next(error);
+  }
+}
+
+async function getBedAvailabilityLog(req, res, next) {
+  try {
+    const filters = {
+      hospitalId: req.body?.hospitalId ||  0,
+      fromDate: req.body?.fromDate || null,
+      toDate: req.body?.toDate ||  null,
+      userId: req.body?.userId ||  null,
+      ulbId: req.body?.ulbId ||  0,
+    };
+
+    const rows = await serviceBedAvailabilityLog(filters);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Bed Availability Log fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'Bed Availability Log fetch error');
+    return next(error);
+  }
+}
+
+async function getUserDropdownList(req, res, next) {
+  try {
+    const ulbid = req.body?.ulbId || 0;
+    const rows = await serviceUserDropdownList(ulbid);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'User Dropdown List fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'User Dropdown List fetch error');
+    return next(error);
+  }
+}
+
 module.exports = {
   getHospitalList,
   getHospitalById,
   insertHospital,
   getBedCategoryList,
   insertBedCategory,
+  getBedAvailabilityList,
+  getBedAvailabilityCounts,
+  getHospitalDropdownList,
+  insertBedAvailability,
+  getHospitalBedSummary,
+  getBedAvailabilityLog,
+  getUserDropdownList,
 };
+
+
+

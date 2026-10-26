@@ -70,7 +70,7 @@ export function DataProvider({ children }) {
               oldOccupied: old[ci][qi].occupied,
               newOccupied: cell.occupied,
               user: 'admin',
-              ip: '127.0.0.1',
+              ip: (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('vvcmc_device_ip')) || '127.0.0.1',
             });
           }
         })
