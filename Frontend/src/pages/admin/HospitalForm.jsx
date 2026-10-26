@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { post } from '../../services/apiService.js';
 import Modal from '../../components/Modal.jsx';
 import { inputHandlers, validateHospitalForm } from '../../validation/inputValidations.js';
+import { getIpAddress, getSource } from '../../utils/device.js';
 
 const BASE_TYPES = ['Municipal', 'Government', 'Private', 'Trust'];
 
@@ -127,6 +128,11 @@ export default function HospitalForm({ mode }) {
       const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
       const modeValue = isEdit ? 2 : 1;
 
+      const [ipAddress, ipSource] = await Promise.all([
+        getIpAddress(),
+        Promise.resolve(getSource()),
+      ]);
+
       const payload = {
         userId: user?.userId || 'admin',
         hospitalId: targetHospitalId,
@@ -140,6 +146,8 @@ export default function HospitalForm({ mode }) {
         email: form.email.trim(),
         status: form.active ? 'Y' : 'N',
         mode: modeValue,
+        ipAddress: ipAddress || '127.0.0.1',
+        ipSource: ipSource || 'RW',
       };
 
       const res = await post('/hospitalMst/insertHospital', payload);

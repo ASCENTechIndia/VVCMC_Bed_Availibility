@@ -3,9 +3,11 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
+import Modal from '../../components/Modal.jsx';
 import { formatDateTime } from '../../utils.js';
 import { CATEGORIES, QUOTAS } from '../../data/seed.js';
 import { post } from '../../services/apiService.js';
+import { getIpAddress, getSource } from '../../utils/device.js';
 
 const emptyBeds = () =>
   CATEGORIES.map(() => QUOTAS.map(() => ({ total: 0, occupied: 0 })));
@@ -52,9 +54,9 @@ export default function BedForm({ mode }) {
   });
 
   // Fetch hospital details and bed availability list from API
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (showLoading = true) => {
     if (!id) return;
-    setLoading(true);
+    if (showLoading) setLoading(true);
     const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
 
     try {
@@ -105,11 +107,15 @@ export default function BedForm({ mode }) {
       });
 
       if (categoryRows.length > 0) {
-        const parsedCats = categoryRows.map((r, idx) => ({
-          id: Number(r.NUM_BEDCATEGORY_ID) || (idx + 1),
-          name: r.BED_CATEGORY || `Category ${idx + 1}`,
-          bedAvailabilityId: Number(r.NUM_BEDAVAILABILITY_ID || 0),
-        }));
+        const parsedCats = categoryRows.map((r, idx) => {
+          const availId = Number(r.BEDAVAIL_ID || r.BED_AVAILABILITY_ID || 0);
+          return {
+            id: Number(r.BED_CATEGORY_ID) || (idx + 1),
+            name: r.BED_CATEGORY || `Category ${idx + 1}`,
+            bedAvailabilityId: availId,
+            BEDAVAIL_ID: availId,
+          };
+        });
 
         const mapped = categoryRows.map((row) => [
           // Regular
@@ -136,6 +142,7 @@ export default function BedForm({ mode }) {
         const parsedCats = CATEGORIES.map((cat) => ({
           ...cat,
           bedAvailabilityId: 0,
+          BEDAVAIL_ID: 0,
         }));
         setCategories(parsedCats);
         setStoredBeds(emptyBeds());
@@ -143,12 +150,12 @@ export default function BedForm({ mode }) {
     } catch (err) {
       console.error('Error loading bed form data:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, [id, user?.ulbId, user?.ulbd, nameParam]);
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, [loadData]);
 
   if (!id) return <Navigate to="/select-hospital" replace />;
@@ -163,13 +170,13 @@ export default function BedForm({ mode }) {
 
   return (
     <BedFormInner
-      key={`${id}-${loading}`}
+      key={id}
       mode={mode}
       hospital={hospital || { id, name: nameParam || `Hospital #${id}` }}
       stored={storedBeds}
       categories={categories}
       onSave={mode === 'update' ? saveOccupied : saveCapacity}
-      onRefresh={loadData}
+      onRefresh={() => loadData(false)}
       user={user}
     />
   );
@@ -180,6 +187,9 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
   const [cats, setCats] = useState(categories || []);
   const [msg, setMsg] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState('success');
   const isUpdate = mode === 'update';
 
   useEffect(() => {
@@ -214,14 +224,19 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
       const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
       const targetUserId = user?.userId || user?.username || 'admin';
 
+      const [ipAddress, ipSource] = await Promise.all([
+        getIpAddress(),
+        Promise.resolve(getSource()),
+      ]);
+
       // Post updates to backend insertBedAvailability for each category
       const requests = rows.map(async (catRow, ci) => {
-        const cat = cats[ci] || CATEGORIES[ci] || { id: ci + 1, bedAvailabilityId: 0 };
+        const cat = cats[ci] || CATEGORIES[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
         const reg = catRow[0] || { total: 0, occupied: 0 };
         const res = catRow[1] || { total: 0, occupied: 0 };
         const con = catRow[2] || { total: 0, occupied: 0 };
 
-        const availId = Number(cat.bedAvailabilityId || 0);
+        const availId = Number(cat.BEDAVAIL_ID || cat.bedAvailabilityId || 0);
         const modeVal = availId > 0 ? 2 : 1;
 
         const payload = {
@@ -238,8 +253,8 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
           concessionalOccupied: Number(con.occupied || 0),
           status: 'Y',
           mode: modeVal,
-          ipAddress: '127.0.0.1',
-          ipSource: 'RW',
+          ipAddress: ipAddress || '127.0.0.1',
+          ipSource: ipSource || 'RW',
         };
 
         const resData = await post('/hospitalMst/insertBedAvailability', payload);
@@ -254,17 +269,24 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
 
       if (failed.length > 0) {
         const firstErr = failed[0]?.resData?.data?.message || 'Failed to update some bed categories.';
+        const errText = `${firstErr} (${failed.length} categories failed)`;
         setMsg({
           type: 'err',
-          text: `${firstErr} (${failed.length} categories failed)`,
+          text: errText,
         });
+        setModalMessage(errText);
+        setModalType('warning');
+        setModalOpen(true);
       } else {
         const successMessage =
-          results[0]?.resData?.data?.message || 'Data Updated Successfully';
+          results[0]?.resData?.data?.message || results[0]?.resData?.message || 'Data Updated Successfully';
         setMsg({
           type: 'ok',
           text: successMessage,
         });
+        setModalMessage(successMessage);
+        setModalType('success');
+        setModalOpen(true);
 
         if (onRefresh) {
           onRefresh();
@@ -276,10 +298,14 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
       }
     } catch (err) {
       console.error('Failed to save bed availability:', err);
+      const errText = err?.message || 'Failed to save bed availability.';
       setMsg({
         type: 'err',
-        text: err?.message || 'Failed to save bed availability.',
+        text: errText,
       });
+      setModalMessage(errText);
+      setModalType('warning');
+      setModalOpen(true);
     } finally {
       setSaving(false);
     }
@@ -313,6 +339,16 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
         </p>
         <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
       </form>
+
+      {/* Response Modal */}
+      <Modal
+        isOpen={modalOpen}
+        type={modalType}
+        title={modalType === 'success' ? 'Success' : 'Notice'}
+        message={modalMessage}
+        onOk={() => setModalOpen(false)}
+        okText="OK"
+      />
     </>
   );
 }

@@ -98,7 +98,7 @@ async function repoHospitalIns(payload) {
     IN_HOSPITALTYPE: payload.hospitalType,
     IN_ADDRESS: payload.address,
     IN_AREAWARD: payload.areaWard,
-    IN_PINCODE: payload.pinco de,
+    IN_PINCODE: payload.pincode,
     IN_PHONE: payload.phone,
     IN_EMAIL: payload.email,
     IN_STATUS: payload.status,
@@ -179,7 +179,7 @@ async function repoBedCategoryIns(payload) {
   const binds = {
     IN_USERID: payload.userId ? String(payload.userId) : '',
     IN_ID: Number(payload.bedCategoryId ?? 0),
-    IN_ULBID: Number(payload.ulb Id ?? 0),
+    IN_ULBID: Number(payload.ulbId ?? 0),
     IN_BEDCATEGORYNAME: payload.bedCategoryName ?? '',
     IN_STATUS: payload.status ?? '',
     IN_MODE: Number(payload.mode ?? 0),
@@ -220,6 +220,9 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
         H.VAR_HOSPITAL_NAME AS HOSPITAL_NAME,
         H.NUM_HOSPITAL_ID AS HOSPITAL_ID,
         B.NUM_BEDCATEGORY_ID AS BED_CATEGORY_ID,
+        B.NUM_BEDCATEGORY_ID,
+        MAX(A.NUM_BEDAVAILABILITY_ID) AS BEDAVAIL_ID,
+        MAX(A.NUM_BEDAVAILABILITY_ID) AS NUM_BEDAVAILABILITY_ID,
         NVL(B.VAR_BEDCATEGORY_NAME, 'Total') AS BED_CATEGORY,
      
         SUM(NVL(A.NUM_REGULAR_TOTAL, 0)) AS REGULAR_TOTAL,
@@ -251,13 +254,14 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
      
     GROUP BY GROUPING SETS
     (
-        (H.VAR_HOSPITAL_NAME, B.NUM_BEDCATEGORY_ID, B.VAR_BEDCATEGORY_NAME),
-        (H.VAR_HOSPITAL_NAME)
+        (H.VAR_HOSPITAL_NAME, H.NUM_HOSPITAL_ID, B.NUM_BEDCATEGORY_ID, B.VAR_BEDCATEGORY_NAME),
+        (H.VAR_HOSPITAL_NAME, H.NUM_HOSPITAL_ID)
     )
      
     ORDER BY
         GROUPING(B.VAR_BEDCATEGORY_NAME),
-        B.NUM_BEDCATEGORY_ID
+        B.NUM_BEDCATEGORY_ID,
+        H.NUM_HOSPITAL_ID
   `;
 
   const binds = {
@@ -287,7 +291,7 @@ async function repoBedAvailabilityCounts(ulbid) {
             (NVL(NUM_REGULAR_TOTAL, 0) - NVL(NUM_REGULAR_OCCUPIED, 0))
             + (NVL(NUM_RESERVED_TOTAL, 0) - NVL(NUM_RESERVED_OCCUPIED, 0))
             + (NVL(NUM_CONCESSIONAL_TOTAL, 0) - NVL(NUM_CONCESSIONAL_OCCUPIED, 0))
-        ) AS AVAILABLE_B  EDS
+        ) AS AVAILABLE_BEDS
      
     FROM AOHA_BEDAVAILABILITY_MAS
     WHERE NUM_BEDAVAILABILITY_ULBID = :ulbid
