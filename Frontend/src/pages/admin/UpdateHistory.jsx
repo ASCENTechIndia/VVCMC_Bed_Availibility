@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useData } from '../../context/DataContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { post } from '../../services/apiService.js';
 import { formatDateTime24 } from '../../utils.js';
 
 const PAGE_SIZE = 10;
@@ -8,18 +10,72 @@ const dayStart = (s) => new Date(`${s}T00:00:00`).getTime();
 const dayEnd = (s) => new Date(`${s}T23:59:59.999`).getTime();
 
 export default function UpdateHistory() {
-  const { hospitals, history } = useData();
+  const { hospitals: contextHospitals, history } = useData();
+  const { user } = useAuth();
+
+  const [hospitals, setHospitals] = useState([]);
+  const [loadingHospitals, setLoadingHospitals] = useState(false);
+  const [hospError, setHospError] = useState('');
+
   const [draft, setDraft] = useState({ hospital: '', from: '', to: '', user: '' });
   const [filter, setFilter] = useState(draft);
   const [page, setPage] = useState(1);
 
-  const nameOf = (id) => hospitals.find((h) => h.id === id)?.name ?? `#${id}`;
+  // Fetch hospital dropdown list from API
+  const fetchHospitalDropdown = useCallback(async () => {
+    try {
+      setLoadingHospitals(true);
+      setHospError('');
+      const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
+      const res = await post('/hospitalMst/hospitalDropdownList', {
+        ulbId: targetUlbId,
+        ulbid: targetUlbId,
+      });
+
+      const raw = Array.isArray(res?.data)
+        ? res.data
+        : Array.isArray(res)
+          ? res
+          : [];
+
+      const formatted = raw
+        .map((item) => ({
+          id: Number(item.NUM_HOSPITAL_ID ?? item.num_hospital_id ?? item.id),
+          name: item.VAR_HOSPITAL_NAME || item.var_hospital_name || item.name || '',
+          value: Number(item.NUM_HOSPITAL_ID ?? item.num_hospital_id ?? item.id),
+          label: item.VAR_HOSPITAL_NAME || item.var_hospital_name || item.name || '',
+        }))
+        .filter((h) => h.id && h.name);
+
+      setHospitals(formatted);
+    } catch (err) {
+      console.error('Failed to load hospital dropdown options:', err);
+      setHospError(err?.message || 'Failed to load hospitals');
+    } finally {
+      setLoadingHospitals(false);
+    }
+  }, [user?.ulbId, user?.ulbd]);
+
+  useEffect(() => {
+    fetchHospitalDropdown();
+  }, [fetchHospitalDropdown]);
+
+  const displayHospitals = hospitals.length > 0 ? hospitals : (contextHospitals || []);
+
+  const nameOf = (id) => {
+    const numId = Number(id);
+    const foundApi = hospitals.find((h) => Number(h.id) === numId);
+    if (foundApi) return foundApi.name;
+    const foundCtx = contextHospitals?.find((h) => Number(h.id) === numId);
+    return foundCtx?.name ?? `#${id}`;
+  };
+
   const users = [...new Set(history.map((r) => r.user))];
 
   const list = history.filter((r) => {
     const t = new Date(r.at).getTime();
     return (
-      (!filter.hospital || r.hospitalId === Number(filter.hospital)) &&
+      (!filter.hospital || Number(r.hospitalId) === Number(filter.hospital)) &&
       (!filter.from || t >= dayStart(filter.from)) &&
       (!filter.to || t <= dayEnd(filter.to)) &&
       (!filter.user || r.user === filter.user)
@@ -55,7 +111,31 @@ export default function UpdateHistory() {
 
   return (
     <>
-      <h1>Update History / Audit Log</h1>
+      <div className="ph">
+        <div>
+          <h1>Update History / Audit Log</h1>
+          <p className="sm">Track all bed status updates and changes across hospitals.</p>
+        </div>
+        <button
+          type="button"
+          className="btn s g2"
+          onClick={fetchHospitalDropdown}
+          disabled={loadingHospitals}
+          title="Refresh hospital dropdown list"
+        >
+          {loadingHospitals ? 'Refreshing...' : '↻ Refresh Hospitals'}
+        </button>
+      </div>
+
+      {hospError && (
+        <div className="alert err" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <span>Failed to load hospital list: {hospError}</span>
+          <button type="button" className="btn s y" onClick={fetchHospitalDropdown}>
+            Retry
+          </button>
+        </div>
+      )}
+
       <form
         className="card bar"
         onSubmit={(e) => {
@@ -66,9 +146,23 @@ export default function UpdateHistory() {
       >
         <div>
           <label htmlFor="h">Hospital</label>
-          <select id="h" name="hospital_id" value={draft.hospital} onChange={set('hospital')}>
+          <select
+            id="h"
+            name="hospital_id"
+            value={draft.hospital}
+            onChange={set('hospital')}
+            disabled={loadingHospitals && hospitals.length === 0}
+          >
             <option value="">All</option>
-            {hospitals.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+            {loadingHospitals && hospitals.length === 0 ? (
+              <option disabled>Loading hospitals...</option>
+            ) : (
+              displayHospitals.map((h) => (
+                <option key={h.id} value={h.id}>
+                  {h.name}
+                </option>
+              ))
+            )}
           </select>
         </div>
         <div>
@@ -126,3 +220,4 @@ export default function UpdateHistory() {
     </>
   );
 }
+

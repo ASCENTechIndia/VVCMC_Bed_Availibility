@@ -1,0 +1,2 @@
+{"level":30,"time":1793006229997,"pid":12468,"hostname":"DESKTOP-N4U5EV1","name":"success","method":"POST","path":"/hospitalDropdownList","statusCode":200,"ip":"::1","responseData":"{\"count\":7}","msg":"Hospital Dropdown List fetched successfully"}
+{"level":30,"time":1793006230006,"pid":12468,"hostname":"DESKTOP-N4U5EV1","name":"success","method":"POST","path":"/hospitalDropdownList","statusCode":200,"ip":"::1","responseData":"{\"count\":7}","msg":"Hospital Dropdown List fetched successfully"}
