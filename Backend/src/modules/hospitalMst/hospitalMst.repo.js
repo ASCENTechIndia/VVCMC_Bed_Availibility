@@ -218,6 +218,8 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
   const sql = `
     SELECT
         H.VAR_HOSPITAL_NAME AS HOSPITAL_NAME,
+        H.NUM_HOSPITAL_ID AS HOSPITAL_ID,
+        B.NUM_BEDCATEGORY_ID AS BED_CATEGORY_ID,
         NVL(B.VAR_BEDCATEGORY_NAME, 'Total') AS BED_CATEGORY,
      
         SUM(NVL(A.NUM_REGULAR_TOTAL, 0)) AS REGULAR_TOTAL,
