@@ -19,6 +19,40 @@ export default function SelectHospital() {
   const [bedList, setBedList] = useState([]);
   const [loadingBeds, setLoadingBeds] = useState(false);
   const [bedError, setBedError] = useState('');
+  const [categories, setCategories] = useState([]);
+
+  // Fetch bed category master list from API
+  const fetchBedCategories = useCallback(async () => {
+    try {
+      const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
+      const res = await post('/hospitalMst/bedCategoryList', {
+        ulbid: targetUlbId,
+        ulbId: targetUlbId,
+      });
+
+      const raw = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+      const formatted = raw
+        .filter((item) => {
+          const status = String(item.VAR_BEDCATEGORY_STATUS ?? item.var_bedcategory_status ?? item.status ?? 'Y').toUpperCase().trim();
+          return status === 'Y';
+        })
+        .map((item) => ({
+          id: Number(item.NUM_BEDCATEGORY_ID ?? item.num_bedcategory_id ?? item.id),
+          name: item.VAR_BEDCATEGORY_NAME ?? item.var_bedcategory_name ?? item.name ?? '',
+          status: 'Y',
+          BED_CATEGORY: item.VAR_BEDCATEGORY_NAME ?? item.var_bedcategory_name ?? item.name ?? '',
+        }))
+        .filter((c) => c.id && c.name);
+
+      setCategories(formatted);
+    } catch (err) {
+      console.warn('Failed to load bed category master from API:', err);
+    }
+  }, [user?.ulbId, user?.ulbd]);
+
+  useEffect(() => {
+    fetchBedCategories();
+  }, [fetchBedCategories]);
 
   // Fetch hospital dropdown list from API
   const fetchHospitalDropdown = useCallback(async () => {
@@ -86,7 +120,13 @@ export default function SelectHospital() {
           ? res
           : [];
 
-      setBedList(raw);
+      // Filter out any row where category status is 'N'
+      const activeRows = raw.filter((r) => {
+        const status = String(r.VAR_BEDCATEGORY_STATUS ?? r.var_bedcategory_status ?? r.status ?? 'Y').toUpperCase().trim();
+        return status !== 'N';
+      });
+
+      setBedList(activeRows);
     } catch (err) {
       console.error('Failed to load bed availability list:', err);
       setBedError(err?.message || 'Failed to load bed availability details.');
@@ -301,7 +341,7 @@ export default function SelectHospital() {
           </div>
         ) : (
           <>
-            <BedTable rows={bedList} mode="view" showHindi />
+            <BedTable rows={bedList} mode="view" showHindi categories={categories} />
             <p className="legend">
               <span className="g">● Beds available</span> &nbsp; <span className="w">● Few beds left (20% or less)</span>{' '}
               &nbsp; <span className="r">● Full</span> &nbsp;|&nbsp; Available = Total − Occupied

@@ -1,4 +1,4 @@
-import { CATEGORIES, QUOTAS } from '../data/seed.js';
+import { QUOTAS } from '../data/seed.js';
 import { availabilityClass, columnTotals } from '../utils.js';
 
 /**
@@ -32,6 +32,11 @@ export default function BedTable({
     return isNaN(n) ? 0 : n;
   };
 
+  const isCategoryInactive = (r) => {
+    const status = String(r?.VAR_BEDCATEGORY_STATUS ?? r?.var_bedcategory_status ?? r?.status ?? 'Y').toUpperCase().trim();
+    return status === 'N';
+  };
+
   // Check if rows is in API format (array of objects with category or hospital properties)
   const isApiData =
     Array.isArray(rows) &&
@@ -53,7 +58,7 @@ export default function BedTable({
       return name === 'total' || name === 'एकूण';
     };
 
-    const itemRows = rows.filter((r) => !isTotal(r));
+    const itemRows = rows.filter((r) => !isTotal(r) && !isCategoryInactive(r));
     const totalRowFromData = rows.find((r) => isTotal(r));
 
     const totalCategoryCount = itemRows.reduce((s, r) => s + getCatCount(r), 0);
@@ -215,8 +220,13 @@ export default function BedTable({
     );
   }
 
-  // Safe fallback for legacy 2D array
-  const cats = Array.isArray(categories) && categories.length > 0 ? categories : CATEGORIES;
+  // Fallback for 2D array or category list (only active categories where status is not 'N')
+  const cats = (Array.isArray(categories) && categories.length > 0 ? categories : [])
+    .filter((cat) => {
+      const status = String(cat?.VAR_BEDCATEGORY_STATUS ?? cat?.var_bedcategory_status ?? cat?.status ?? 'Y').toUpperCase().trim();
+      return status !== 'N';
+    });
+
   const safeRows =
     Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])
       ? rows
@@ -249,26 +259,34 @@ export default function BedTable({
           </tr>
         </thead>
         <tbody>
-          {cats.map((cat, ci) => (
-            <tr key={cat.id || ci}>
-              <td className="l">{cat.name || cat.VAR_BEDCATEGORY_NAME || cat.BED_CATEGORY}</td>
-              {QUOTAS.map((q, qi) => {
-                const cell = safeRows[ci]?.[qi] || { total: 0, occupied: 0 };
-                const available = cell.total - cell.occupied;
-                return (
-                  <FragmentCells
-                    key={q.id}
-                    cell={cell}
-                    available={available}
-                    mode={mode}
-                    name={`${cat.id}_${q.id}`}
-                    onTotal={(v) => onChange && onChange(ci, qi, 'total', v)}
-                    onOccupied={(v) => onChange && onChange(ci, qi, 'occupied', v)}
-                  />
-                );
-              })}
+          {cats.length === 0 ? (
+            <tr>
+              <td colSpan={10} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                No bed categories available.
+              </td>
             </tr>
-          ))}
+          ) : (
+            cats.map((cat, ci) => (
+              <tr key={cat.id || ci}>
+                <td className="l">{cat.name || cat.VAR_BEDCATEGORY_NAME || cat.BED_CATEGORY}</td>
+                {QUOTAS.map((q, qi) => {
+                  const cell = safeRows[ci]?.[qi] || { total: 0, occupied: 0 };
+                  const available = cell.total - cell.occupied;
+                  return (
+                    <FragmentCells
+                      key={q.id}
+                      cell={cell}
+                      available={available}
+                      mode={mode}
+                      name={`${cat.id}_${q.id}`}
+                      onTotal={(v) => onChange && onChange(ci, qi, 'total', v)}
+                      onOccupied={(v) => onChange && onChange(ci, qi, 'occupied', v)}
+                    />
+                  );
+                })}
+              </tr>
+            ))
+          )}
         </tbody>
         <tfoot>
           <tr>

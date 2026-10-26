@@ -79,16 +79,10 @@ export default function Login() {
       }
 
       const rawUser = res?.data?.user || { userId: username.trim() };
-      const ulbdValue =
-        rawUser.ulbd ||
-        rawUser.ulbId ||
-        rawUser.orgId ||
-        rawUser.out_OrgId ||
-        rawUser.OUT_ORGID;
+      const ulbdValue = rawUser.orgId;
 
       const userData = {
         ...rawUser,
-        ulbd: ulbdValue,
         ulbId: ulbdValue,
       };
       const authToken = res?.data?.token || '';
@@ -150,7 +144,7 @@ export default function Login() {
         </a> */}
       </p>
       <p className="sm c" style={{ marginTop: '12px' }}>
-        <Link to="/citizendashboard">← Citizen Bed Availability Dashboard</Link>
+        <Link to="/hospitaldashboard">← Citizen Bed Availability Dashboard</Link>
       </p>
     </div>
   );

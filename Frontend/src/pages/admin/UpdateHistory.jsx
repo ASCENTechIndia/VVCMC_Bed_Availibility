@@ -13,6 +13,14 @@ function safeFormatDateTime24(iso) {
   return formatDateTime24(iso);
 }
 
+function getTodayDateStr() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export default function UpdateHistory() {
   const { hospitals: contextHospitals } = useData();
   const { user } = useAuth();
@@ -29,7 +37,8 @@ export default function UpdateHistory() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
 
-  const [draft, setDraft] = useState({ hospital: '', from: '', to: '', user: '' });
+  const today = getTodayDateStr();
+  const [draft, setDraft] = useState({ hospital: '', from: today, to: today, user: '' });
   const [filter, setFilter] = useState(draft);
   const [page, setPage] = useState(1);
 
@@ -302,10 +311,11 @@ export default function UpdateHistory() {
           className="btn g2"
           type="button"
           onClick={() => {
-            const emptyDraft = { hospital: '', from: '', to: '', user: '' };
-            setDraft(emptyDraft);
-            setFilter(emptyDraft);
-            fetchHistory(emptyDraft);
+            const todayStr = getTodayDateStr();
+            const resetDraft = { hospital: '', from: todayStr, to: todayStr, user: '' };
+            setDraft(resetDraft);
+            setFilter(resetDraft);
+            fetchHistory(resetDraft);
             setPage(1);
           }}
           disabled={loadingHistory}

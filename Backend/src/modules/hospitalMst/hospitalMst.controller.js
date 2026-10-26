@@ -239,11 +239,11 @@ async function getHospitalBedSummary(req, res, next) {
 async function getBedAvailabilityLog(req, res, next) {
   try {
     const filters = {
-      hospitalId: req.body?.hospitalId ||  0,
+      hospitalId: req.body?.hospitalId || 0,
       fromDate: req.body?.fromDate || null,
-      toDate: req.body?.toDate ||  null,
-      userId: req.body?.userId ||  null,
-      ulbId: req.body?.ulbId ||  0,
+      toDate: req.body?.toDate || null,
+      userId: req.body?.userId || null,
+      ulbId: req.body?.ulbId || 0,
     };
 
     const rows = await serviceBedAvailabilityLog(filters);

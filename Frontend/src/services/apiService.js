@@ -3,7 +3,7 @@
  * Base URL is configured via environment variable VITE_API_BASE_URL
  */
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+  import.meta.env.VITE_API_BASE_URL || 'https://bedavailibilityapi.nagarkaryavalinewuat.com/api';
 
 /**
  * Generic request wrapper with JSON and error handling

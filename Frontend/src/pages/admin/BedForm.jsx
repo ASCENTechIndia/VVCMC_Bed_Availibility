@@ -5,15 +5,15 @@ import { useData } from '../../context/DataContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
 import Modal from '../../components/Modal.jsx';
 import { formatDateTime } from '../../utils.js';
-import { CATEGORIES, QUOTAS } from '../../data/seed.js';
+import { QUOTAS } from '../../data/seed.js';
 import { post } from '../../services/apiService.js';
 import { getIpAddress, getSource } from '../../utils/device.js';
 
-const emptyBeds = () =>
-  CATEGORIES.map(() => QUOTAS.map(() => ({ total: 0, occupied: 0 })));
+const emptyBeds = (count = 0) =>
+  Array.from({ length: count }, () => QUOTAS.map(() => ({ total: 0, occupied: 0 })));
 
 const clone = (rows) =>
-  (rows && Array.isArray(rows) && rows.length > 0 ? rows : emptyBeds()).map((r) =>
+  (rows && Array.isArray(rows) && rows.length > 0 ? rows : []).map((r) =>
     (Array.isArray(r) ? r : []).map((c) => ({
       total: Number(c?.total || 0),
       occupied: Number(c?.occupied || 0),
@@ -46,14 +46,12 @@ export default function BedForm({ mode }) {
   });
 
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState(() =>
-    CATEGORIES.map((cat) => ({ ...cat, bedAvailabilityId: 0 }))
-  );
+  const [categories, setCategories] = useState([]);
   const [storedBeds, setStoredBeds] = useState(() => {
-    return beds[id] || emptyBeds();
+    return Array.isArray(beds[id]) ? beds[id] : [];
   });
 
-  // Fetch hospital details and bed availability list from API
+  // Fetch hospital details, bed availability list, and bed category list from API
   const loadData = useCallback(async (showLoading = true) => {
     if (!id) return;
     if (showLoading) setLoading(true);
@@ -78,7 +76,16 @@ export default function BedForm({ mode }) {
         return null;
       });
 
-      const [hspRes, bedRes] = await Promise.all([hspPromise, bedPromise]);
+      // 3. Fetch Bed Category List from API (Master Categories)
+      const catPromise = post('/hospitalMst/bedCategoryList', {
+        ulbid: targetUlbId,
+        ulbId: targetUlbId,
+      }).catch((err) => {
+        console.warn('Could not load bed category master from API:', err);
+        return null;
+      });
+
+      const [hspRes, bedRes, catRes] = await Promise.all([hspPromise, bedPromise, catPromise]);
 
       // Process hospital details
       if (hspRes?.data) {
@@ -93,6 +100,21 @@ export default function BedForm({ mode }) {
         });
       }
 
+      // Active master categories (excluding status === 'N')
+      const rawCats = Array.isArray(catRes?.data) ? catRes.data : [];
+      const activeMasterCats = rawCats
+        .filter((c) => {
+          const status = String(c.VAR_BEDCATEGORY_STATUS ?? c.var_bedcategory_status ?? c.status ?? 'Y').toUpperCase().trim();
+          return status === 'Y';
+        })
+        .map((c, idx) => ({
+          id: Number(c.NUM_BEDCATEGORY_ID ?? c.num_bedcategory_id ?? (idx + 1)),
+          name: c.VAR_BEDCATEGORY_NAME ?? c.var_bedcategory_name ?? `Category ${idx + 1}`,
+          status: 'Y',
+          bedAvailabilityId: 0,
+          BEDAVAIL_ID: 0,
+        }));
+
       // Process bed availability
       const rawBeds = Array.isArray(bedRes?.data)
         ? bedRes.data
@@ -100,53 +122,81 @@ export default function BedForm({ mode }) {
           ? bedRes
           : [];
 
-      // Filter out 'Total' summary row
+      // Filter out 'Total' summary row AND any category with status 'N'
       const categoryRows = rawBeds.filter((r) => {
         const name = String(r.BED_CATEGORY || r.bed_category || '').trim().toLowerCase();
-        return name !== 'total' && name !== 'एकूण';
+        if (name === 'total' || name === 'एकूण') return false;
+        const status = String(r.VAR_BEDCATEGORY_STATUS ?? r.var_bedcategory_status ?? r.status ?? 'Y').toUpperCase().trim();
+        return status !== 'N';
       });
 
-      if (categoryRows.length > 0) {
-        const parsedCats = categoryRows.map((r, idx) => {
+      const finalCats = [];
+      const mapped = [];
+
+      if (activeMasterCats.length > 0) {
+        // Base rows on the active categories from master API
+        activeMasterCats.forEach((mCat) => {
+          const matchedRow = categoryRows.find((r) => {
+            const rId = Number(r.BED_CATEGORY_ID ?? r.bed_category_id);
+            const rName = String(r.BED_CATEGORY ?? r.bed_category ?? '').trim().toLowerCase();
+            return (rId && rId === mCat.id) || (rName && rName === mCat.name.trim().toLowerCase());
+          });
+
+          const availId = matchedRow ? Number(matchedRow.BEDAVAIL_ID || matchedRow.BED_AVAILABILITY_ID || 0) : 0;
+          finalCats.push({
+            ...mCat,
+            bedAvailabilityId: availId,
+            BEDAVAIL_ID: availId,
+          });
+
+          mapped.push([
+            // Regular
+            {
+              total: matchedRow ? Number(matchedRow.REGULAR_TOTAL ?? matchedRow.regular_total ?? 0) : 0,
+              occupied: matchedRow ? Number(matchedRow.REGULAR_OCCUPIED ?? matchedRow.regular_occupied ?? 0) : 0,
+            },
+            // Reserved
+            {
+              total: matchedRow ? Number(matchedRow.RESERVED_TOTAL ?? matchedRow.reserved_total ?? 0) : 0,
+              occupied: matchedRow ? Number(matchedRow.RESERVED_OCCUPIED ?? matchedRow.reserved_occupied ?? 0) : 0,
+            },
+            // Concessional
+            {
+              total: matchedRow ? Number(matchedRow.CONCESSIONAL_TOTAL ?? matchedRow.concessional_total ?? 0) : 0,
+              occupied: matchedRow ? Number(matchedRow.CONCESSIONAL_OCCUPIED ?? matchedRow.concessional_occupied ?? 0) : 0,
+            },
+          ]);
+        });
+      } else if (categoryRows.length > 0) {
+        // Fallback to categoryRows if master categories were not loaded
+        categoryRows.forEach((r, idx) => {
           const availId = Number(r.BEDAVAIL_ID || r.BED_AVAILABILITY_ID || 0);
-          return {
+          finalCats.push({
             id: Number(r.BED_CATEGORY_ID) || (idx + 1),
             name: r.BED_CATEGORY || `Category ${idx + 1}`,
             bedAvailabilityId: availId,
             BEDAVAIL_ID: availId,
-          };
+          });
+
+          mapped.push([
+            {
+              total: Number(r.REGULAR_TOTAL ?? r.regular_total ?? 0),
+              occupied: Number(r.REGULAR_OCCUPIED ?? r.regular_occupied ?? 0),
+            },
+            {
+              total: Number(r.RESERVED_TOTAL ?? r.reserved_total ?? 0),
+              occupied: Number(r.RESERVED_OCCUPIED ?? r.reserved_occupied ?? 0),
+            },
+            {
+              total: Number(r.CONCESSIONAL_TOTAL ?? r.concessional_total ?? 0),
+              occupied: Number(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied ?? 0),
+            },
+          ]);
         });
-
-        const mapped = categoryRows.map((row) => [
-          // Regular
-          {
-            total: Number(row.REGULAR_TOTAL ?? row.regular_total ?? 0),
-            occupied: Number(row.REGULAR_OCCUPIED ?? row.regular_occupied ?? 0),
-          },
-          // Reserved
-          {
-            total: Number(row.RESERVED_TOTAL ?? row.reserved_total ?? 0),
-            occupied: Number(row.RESERVED_OCCUPIED ?? row.reserved_occupied ?? 0),
-          },
-          // Concessional
-          {
-            total: Number(row.CONCESSIONAL_TOTAL ?? row.concessional_total ?? 0),
-            occupied: Number(row.CONCESSIONAL_OCCUPIED ?? row.concessional_occupied ?? 0),
-          },
-        ]);
-
-        setCategories(parsedCats);
-        setStoredBeds(mapped);
-      } else {
-        // Hospital has 0 count / no bed rows yet: initialize with 0s and base categories
-        const parsedCats = CATEGORIES.map((cat) => ({
-          ...cat,
-          bedAvailabilityId: 0,
-          BEDAVAIL_ID: 0,
-        }));
-        setCategories(parsedCats);
-        setStoredBeds(emptyBeds());
       }
+
+      setCategories(finalCats);
+      setStoredBeds(mapped);
     } catch (err) {
       console.error('Error loading bed form data:', err);
     } finally {
@@ -231,7 +281,7 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
 
       // Post updates to backend insertBedAvailability for each category
       const requests = rows.map(async (catRow, ci) => {
-        const cat = cats[ci] || CATEGORIES[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
+        const cat = cats[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
         const reg = catRow[0] || { total: 0, occupied: 0 };
         const res = catRow[1] || { total: 0, occupied: 0 };
         const con = catRow[2] || { total: 0, occupied: 0 };
