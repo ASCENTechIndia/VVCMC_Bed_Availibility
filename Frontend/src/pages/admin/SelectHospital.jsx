@@ -227,9 +227,35 @@ export default function SelectHospital() {
       return;
     }
     setValidationError('');
+
+    if (loadingBeds) {
+      return;
+    }
+
+    // If attempting to update daily bed status and no bed capacity exists / 0 rows returned
+    if (path === '/bed-update') {
+      const hasNoBedCapacity =
+        !bedList ||
+        bedList.length === 0 ||
+        kpiTotals.total === 0 ||
+        !bedList.some((r) => {
+          const regT = Number(r.REGULAR_TOTAL ?? r.regular_total ?? 0);
+          const resT = Number(r.RESERVED_TOTAL ?? r.reserved_total ?? 0);
+          const conT = Number(r.CONCESSIONAL_TOTAL ?? r.concessional_total ?? 0);
+          return regT + resT + conT > 0;
+        });
+
+      if (hasNoBedCapacity) {
+        alert('Please add bed capacity first');
+        setValidationError('Please add bed capacity first / कृपया प्रथम खाटांची क्षमता जोडा.');
+        return;
+      }
+    }
+
     const hName = selectedHospital?.name || '';
     navigate(`${path}?hospital_id=${id}${hName ? `&name=${encodeURIComponent(hName)}` : ''}`);
   };
+
 
   return (
     <>
@@ -298,8 +324,12 @@ export default function SelectHospital() {
         </div>
 
         <p className="actions">
-          <button className="btn y" type="submit" disabled={loading || hospitals.length === 0}>
-            Update Daily Bed Status
+          <button
+            className="btn y"
+            type="submit"
+            disabled={loading || loadingBeds || hospitals.length === 0}
+          >
+            {loadingBeds ? 'Loading Beds...' : 'Update Daily Bed Status'}
           </button>{' '}
           <button
             className="btn"

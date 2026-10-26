@@ -6,16 +6,16 @@ const LOGO = 'https://vvcmc.in/wp-content/uploads/2025/01/VVCMC-New-Logo-Marathi
 const MENU = [
   { to: '/dashboard', label: 'Dashboard', match: ['/dashboard'] },
   {
-    to: '/select-hospital',
-    label: 'Update Bed Status',
-    match: ['/select-hospital', '/bed-update', '/bed-capacity'],
-  },
-  {
     to: '/hospitals',
     label: 'Hospital Master',
     match: ['/hospitals'],
   },
-  { to: '/update-history', label: 'Update History', match: ['/update-history'] },
+  {
+    to: '/select-hospital',
+    label: 'Update Bed Status',
+    match: ['/select-hospital', '/bed-update', '/bed-capacity'],
+  },
+  { to: '/update-history', label: 'Activity Log', match: ['/update-history'] },
 ];
 
 export default function AdminLayout() {
