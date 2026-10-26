@@ -220,7 +220,7 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
         H.VAR_HOSPITAL_NAME AS HOSPITAL_NAME,
         H.NUM_HOSPITAL_ID AS HOSPITAL_ID,
         B.NUM_BEDCATEGORY_ID AS BED_CATEGORY_ID,
-        A.NUM_BEDAVAILABILITY_BEDCATEGORYID AS BEDAVAIL_ID,
+        MAX(A.NUM_BEDAVAILABILITY_ID) AS BEDAVAIL_ID,
         NVL(B.VAR_BEDCATEGORY_NAME, 'Total') AS BED_CATEGORY,
      
         SUM(NVL(A.NUM_REGULAR_TOTAL, 0)) AS REGULAR_TOTAL,
@@ -252,15 +252,15 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
      
     GROUP BY GROUPING SETS
     (
-        (H.VAR_HOSPITAL_NAME, B.NUM_BEDCATEGORY_ID, B.VAR_BEDCATEGORY_NAME, A.NUM_BEDAVAILABILITY_BEDCATEGORYID),
-        (H.VAR_HOSPITAL_NAME),H.NUM_HOSPITAL_ID
-
+        (H.VAR_HOSPITAL_NAME, H.NUM_HOSPITAL_ID, B.NUM_BEDCATEGORY_ID, B.VAR_BEDCATEGORY_NAME),
+        (H.VAR_HOSPITAL_NAME, H.NUM_HOSPITAL_ID)
     )
      
     ORDER BY
         GROUPING(B.VAR_BEDCATEGORY_NAME),
-        B.NUM_BEDCATEGORY_ID
-          `;
+        B.NUM_BEDCATEGORY_ID,
+        H.NUM_HOSPITAL_ID
+  `;
 
   const binds = {
     HospitalId: Number(hospitalId || 0),
@@ -391,6 +391,65 @@ async function repoBedAvailabilityIns(payload) {
   };
 }
 
+/**
+ * Fetch hospital-wise bed availability summary (Hospital ID optional)
+ * @param {number|null} hospitalId - Optional Hospital ID
+ * @param {number} ulbId - ULB ID (defaults to 790)
+ */
+async function repoHospitalBedSummary(hospitalId, ulbId) {
+  const sql = `
+    SELECT
+        H.NUM_HOSPITAL_ID AS HOSPITAL_ID,
+        H.VAR_HOSPITAL_NAME AS HOSPITAL_NAME,
+        COUNT(DISTINCT A.NUM_BEDAVAILABILITY_BEDCATEGORYID) AS BED_CATEGORY_COUNT,
+     
+        SUM(NVL(A.NUM_REGULAR_TOTAL, 0)) AS REGULAR_TOTAL,
+        SUM(NVL(A.NUM_REGULAR_OCCUPIED, 0)) AS REGULAR_OCCUPIED,
+        SUM(NVL(A.NUM_REGULAR_TOTAL, 0)
+            - NVL(A.NUM_REGULAR_OCCUPIED, 0)) AS REGULAR_AVAILABLE,
+     
+        SUM(NVL(A.NUM_RESERVED_TOTAL, 0)) AS RESERVED_TOTAL,
+        SUM(NVL(A.NUM_RESERVED_OCCUPIED, 0)) AS RESERVED_OCCUPIED,
+        SUM(NVL(A.NUM_RESERVED_TOTAL, 0)
+            - NVL(A.NUM_RESERVED_OCCUPIED, 0)) AS RESERVED_AVAILABLE,
+     
+        SUM(NVL(A.NUM_CONCESSIONAL_TOTAL, 0)) AS CONCESSIONAL_TOTAL,
+        SUM(NVL(A.NUM_CONCESSIONAL_OCCUPIED, 0)) AS CONCESSIONAL_OCCUPIED,
+        SUM(NVL(A.NUM_CONCESSIONAL_TOTAL, 0)
+            - NVL(A.NUM_CONCESSIONAL_OCCUPIED, 0)) AS CONCESSIONAL_AVAILABLE
+     
+    FROM AOHA_HOSPITAL_MAS H
+     
+    LEFT JOIN AOHA_BEDAVAILABILITY_MAS A
+        ON A.NUM_BEDAVAILABILITY_HOSPITALID = H.NUM_HOSPITAL_ID
+       AND A.NUM_BEDAVAILABILITY_ULBID = H.NUM_HOSPITAL_ULBID
+       AND A.VAR_BEDAVAILABILITY_STATUS = 'Y'
+     
+    WHERE H.NUM_HOSPITAL_ULBID = :ulbId
+      AND H.VAR_HOSPITAL_STATUS = 'Y'
+      AND (
+            :HospitalId = 0
+            OR :HospitalId IS NULL
+            OR H.NUM_HOSPITAL_ID = :HospitalId
+          )
+     
+    GROUP BY
+        H.NUM_HOSPITAL_ID,
+        H.VAR_HOSPITAL_NAME
+     
+    ORDER BY
+        H.VAR_HOSPITAL_NAME
+  `;
+
+  const binds = {
+    ulbId: Number(ulbId || 0),
+    HospitalId: Number(hospitalId || 0),
+  };
+
+  const result = await executeQuery(sql, binds);
+  return result.rows || [];
+}
+
 module.exports = {
   repoHospitalList,
   repoHospitalById,
@@ -401,4 +460,5 @@ module.exports = {
   repoBedAvailabilityCounts,
   repoHospitalDropdownList,
   repoBedAvailabilityIns,
+  repoHospitalBedSummary,
 };
