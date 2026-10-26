@@ -220,6 +220,7 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
         H.VAR_HOSPITAL_NAME AS HOSPITAL_NAME,
         H.NUM_HOSPITAL_ID AS HOSPITAL_ID,
         B.NUM_BEDCATEGORY_ID AS BED_CATEGORY_ID,
+        A.NUM_BEDAVAILABILITY_BEDCATEGORYID AS BEDAVAIL_ID,
         NVL(B.VAR_BEDCATEGORY_NAME, 'Total') AS BED_CATEGORY,
      
         SUM(NVL(A.NUM_REGULAR_TOTAL, 0)) AS REGULAR_TOTAL,
@@ -251,14 +252,15 @@ async function repoBedAvailabilityList(hospitalId, ulbId) {
      
     GROUP BY GROUPING SETS
     (
-        (H.VAR_HOSPITAL_NAME, B.NUM_BEDCATEGORY_ID, B.VAR_BEDCATEGORY_NAME),
-        (H.VAR_HOSPITAL_NAME)
+        (H.VAR_HOSPITAL_NAME, B.NUM_BEDCATEGORY_ID, B.VAR_BEDCATEGORY_NAME, A.NUM_BEDAVAILABILITY_BEDCATEGORYID),
+        (H.VAR_HOSPITAL_NAME),H.NUM_HOSPITAL_ID
+
     )
      
     ORDER BY
         GROUPING(B.VAR_BEDCATEGORY_NAME),
         B.NUM_BEDCATEGORY_ID
-  `;
+          `;
 
   const binds = {
     HospitalId: Number(hospitalId || 0),
