@@ -63,6 +63,146 @@ export default function BedTable({
 
     const totalCategoryCount = itemRows.reduce((s, r) => s + getCatCount(r), 0);
 
+    // Dedicated simplified table for Hospital View (Hospital Dashboard)
+    if (isHospitalView) {
+      const totalBedsGrand = itemRows.reduce(
+        (s, r) =>
+          s +
+          toNum(r.REGULAR_TOTAL ?? r.regular_total) +
+          toNum(r.RESERVED_TOTAL ?? r.reserved_total) +
+          toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total),
+        0
+      );
+      const totalOccupiedGrand = itemRows.reduce(
+        (s, r) =>
+          s +
+          toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied) +
+          toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied) +
+          toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied),
+        0
+      );
+      const totalReservedGrand = itemRows.reduce(
+        (s, r) => s + toNum(r.RESERVED_TOTAL ?? r.reserved_total),
+        0
+      );
+      const totalConcessionalGrand = itemRows.reduce(
+        (s, r) => s + toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total),
+        0
+      );
+
+      return (
+        <div className="sc">
+          <table className="bt">
+            <thead>
+              <tr>
+                <th>
+                  Hospital Name
+                  {showHindi && (
+                    <>
+                      <br />
+                      रुग्णालय नाव
+                    </>
+                  )}
+                </th>
+                <th>
+                  Total Beds
+                  {showHindi && (
+                    <>
+                      <br />
+                      एकूण बेड
+                    </>
+                  )}
+                </th>
+                <th>
+                  Total Occupied
+                  {showHindi && (
+                    <>
+                      <br />
+                      एकूण भरलेले
+                    </>
+                  )}
+                </th>
+                <th>
+                  Total 10% Reserved Free Beds
+                  {showHindi && (
+                    <>
+                      <br />
+                      १०% राखीव मोफत खाटा
+                    </>
+                  )}
+                </th>
+                <th>
+                  Total 10% Concessional Beds
+                  {showHindi && (
+                    <>
+                      <br />
+                      १०% सवलतीच्या खाटा
+                    </>
+                  )}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {itemRows.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                    No hospital bed records found.
+                  </td>
+                </tr>
+              ) : (
+                itemRows.map((cat, idx) => {
+                  const displayName = getHspName(cat) || `Hospital ${idx + 1}`;
+                  const regT = toNum(cat.REGULAR_TOTAL ?? cat.regular_total);
+                  const regO = toNum(cat.REGULAR_OCCUPIED ?? cat.regular_occupied);
+
+                  const resT = toNum(cat.RESERVED_TOTAL ?? cat.reserved_total);
+                  const resO = toNum(cat.RESERVED_OCCUPIED ?? cat.reserved_occupied);
+
+                  const conT = toNum(cat.CONCESSIONAL_TOTAL ?? cat.concessional_total);
+                  const conO = toNum(cat.CONCESSIONAL_OCCUPIED ?? cat.concessional_occupied);
+
+                  const totalBeds = regT + resT + conT;
+                  const totalOccupied = regO + resO + conO;
+
+                  return (
+                    <tr key={displayName || idx}>
+                      <td className="l">
+                        {onHospitalClick ? (
+                          <button
+                            type="button"
+                            className="hsp-link"
+                            onClick={() => onHospitalClick(cat)}
+                            title={`Click to view bed details for ${displayName}`}
+                          >
+                            {displayName}
+                          </button>
+                        ) : (
+                          displayName
+                        )}
+                      </td>
+                      <td><b>{totalBeds}</b></td>
+                      <td><b>{totalOccupied}</b></td>
+                      <td>{resT}</td>
+                      <td>{conT}</td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td className="l">Total</td>
+                <td><b>{totalBedsGrand}</b></td>
+                <td><b>{totalOccupiedGrand}</b></td>
+                <td><b>{totalReservedGrand}</b></td>
+                <td><b>{totalConcessionalGrand}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      );
+    }
+
     const totalRow = totalRowFromData || {
       BED_CATEGORY: 'Total',
       HOSPITAL_NAME: 'Total',
