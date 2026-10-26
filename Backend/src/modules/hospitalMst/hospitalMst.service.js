@@ -9,6 +9,8 @@ const {
   repoHospitalDropdownList,
   repoBedAvailabilityIns,
   repoHospitalBedSummary,
+  repoBedAvailabilityLog,
+  repoUserDropdownList,
 } = require('./hospitalMst.repo');
 
 async function serviceHospitalList(ulbid) {
@@ -51,6 +53,14 @@ async function serviceHospitalBedSummary(hospitalId, ulbId) {
   return repoHospitalBedSummary(hospitalId, ulbId);
 }
 
+async function serviceBedAvailabilityLog(filters) {
+  return repoBedAvailabilityLog(filters);
+}
+
+async function serviceUserDropdownList(ulbid) {
+  return repoUserDropdownList(ulbid);
+}
+
 module.exports = {
   serviceHospitalList,
   serviceHospitalById,
@@ -62,5 +72,9 @@ module.exports = {
   serviceHospitalDropdownList,
   serviceBedAvailabilityIns,
   serviceHospitalBedSummary,
+  serviceBedAvailabilityLog,
+  serviceUserDropdownList,
 };
+
+
 

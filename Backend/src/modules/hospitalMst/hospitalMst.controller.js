@@ -9,6 +9,8 @@ const {
   serviceHospitalDropdownList,
   serviceBedAvailabilityIns,
   serviceHospitalBedSummary,
+  serviceBedAvailabilityLog,
+  serviceUserDropdownList,
 } = require('./hospitalMst.service');
 const { auditLog } = require('../../utils/audit-log');
 const { logApiSuccess, logApiError } = require('../../utils/log');
@@ -223,13 +225,44 @@ async function insertBedAvailability(req, res, next) {
 
 async function getHospitalBedSummary(req, res, next) {
   try {
-    const hospitalId = req.body?.hospitalId || req.query?.hospitalId || 0;
-    const ulbId = req.body?.ulbId || req.body?.ulbid || req.query?.ulbId || req.query?.ulbid || 790;
+    const hospitalId = req.body?.hospitalId || 0;
+    const ulbId = req.body?.ulbId || 0;
     const rows = await serviceHospitalBedSummary(hospitalId, ulbId);
     logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Hospital Bed Summary fetched successfully');
     return res.ok(rows);
   } catch (error) {
     logApiError(req, 500, error.message, 'Hospital Bed Summary fetch error');
+    return next(error);
+  }
+}
+
+async function getBedAvailabilityLog(req, res, next) {
+  try {
+    const filters = {
+      hospitalId: req.body?.hospitalId ||  0,
+      fromDate: req.body?.fromDate || null,
+      toDate: req.body?.toDate ||  null,
+      userId: req.body?.userId ||  null,
+      ulbId: req.body?.ulbId ||  0,
+    };
+
+    const rows = await serviceBedAvailabilityLog(filters);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'Bed Availability Log fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'Bed Availability Log fetch error');
+    return next(error);
+  }
+}
+
+async function getUserDropdownList(req, res, next) {
+  try {
+    const ulbid = req.body?.ulbId || 0;
+    const rows = await serviceUserDropdownList(ulbid);
+    logApiSuccess(req, 200, { count: rows?.length || 0 }, 'User Dropdown List fetched successfully');
+    return res.ok(rows);
+  } catch (error) {
+    logApiError(req, 500, error.message, 'User Dropdown List fetch error');
     return next(error);
   }
 }
@@ -245,5 +278,9 @@ module.exports = {
   getHospitalDropdownList,
   insertBedAvailability,
   getHospitalBedSummary,
+  getBedAvailabilityLog,
+  getUserDropdownList,
 };
+
+
 
