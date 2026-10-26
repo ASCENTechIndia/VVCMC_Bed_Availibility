@@ -8,7 +8,7 @@ import { availabilityClass, columnTotals } from '../utils.js';
  *   mode="capacity" - Total is editable (bed capacity setup)
  * rows[category][quota] = { total, occupied }
  */
-export default function BedTable({ rows = [], mode = 'view', onChange, showHindi = false }) {
+export default function BedTable({ rows = [], mode = 'view', onChange, showHindi = false, categories }) {
   const getCatName = (cat) =>
     cat?.BED_CATEGORY ?? cat?.bed_category ?? cat?.VAR_BEDCATEGORY_NAME ?? cat?.var_bedcategory_name ?? cat?.name ?? '';
 
@@ -154,10 +154,11 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
   }
 
   // Safe fallback for legacy 2D array
+  const cats = Array.isArray(categories) && categories.length > 0 ? categories : CATEGORIES;
   const safeRows =
     Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])
       ? rows
-      : CATEGORIES.map(() => QUOTAS.map(() => ({ total: 0, occupied: 0 })));
+      : cats.map(() => QUOTAS.map(() => ({ total: 0, occupied: 0 })));
 
   const grand = [0, 1, 2].map((q) => columnTotals(safeRows, q));
 
@@ -186,9 +187,9 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
           </tr>
         </thead>
         <tbody>
-          {CATEGORIES.map((cat, ci) => (
-            <tr key={cat.id}>
-              <td className="l">{cat.name}</td>
+          {cats.map((cat, ci) => (
+            <tr key={cat.id || ci}>
+              <td className="l">{cat.name || cat.VAR_BEDCATEGORY_NAME || cat.BED_CATEGORY}</td>
               {QUOTAS.map((q, qi) => {
                 const cell = safeRows[ci]?.[qi] || { total: 0, occupied: 0 };
                 const available = cell.total - cell.occupied;

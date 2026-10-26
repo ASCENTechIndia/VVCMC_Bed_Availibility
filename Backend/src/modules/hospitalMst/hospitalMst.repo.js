@@ -33,7 +33,7 @@ async function repoHospitalList(ulbid) {
 /**
  * Fetch hospital details by Hospital ID and ULB ID
 **/
-async function repoHospitalById(hospitalId, ulbId ) {
+async function repoHospitalById(hospitalId, ulbId) {
   const sql = `
     SELECT a.num_hospital_id,
            a.num_hospital_ulbid,
@@ -91,14 +91,14 @@ async function repoHospitalIns(payload) {
   `;
 
   const binds = {
-    IN_USERID: payload.userId ? String(payload.userId) :  '',
+    IN_USERID: payload.userId ? String(payload.userId) : '',
     IN_ID: Number(payload.hospitalId),
     IN_ULBID: Number(payload.ulbId),
     IN_HOSPITALNAME: payload.hospitalName,
     IN_HOSPITALTYPE: payload.hospitalType,
     IN_ADDRESS: payload.address,
     IN_AREAWARD: payload.areaWard,
-    IN_PINCODE: payload.pincode ,
+    IN_PINCODE: payload.pinco de,
     IN_PHONE: payload.phone,
     IN_EMAIL: payload.email,
     IN_STATUS: payload.status,
@@ -179,7 +179,7 @@ async function repoBedCategoryIns(payload) {
   const binds = {
     IN_USERID: payload.userId ? String(payload.userId) : '',
     IN_ID: Number(payload.bedCategoryId ?? 0),
-    IN_ULBID: Number(payload.ulbId  ?? 0),
+    IN_ULBID: Number(payload.ulb Id ?? 0),
     IN_BEDCATEGORYNAME: payload.bedCategoryName ?? '',
     IN_STATUS: payload.status ?? '',
     IN_MODE: Number(payload.mode ?? 0),
@@ -285,12 +285,12 @@ async function repoBedAvailabilityCounts(ulbid) {
             (NVL(NUM_REGULAR_TOTAL, 0) - NVL(NUM_REGULAR_OCCUPIED, 0))
             + (NVL(NUM_RESERVED_TOTAL, 0) - NVL(NUM_RESERVED_OCCUPIED, 0))
             + (NVL(NUM_CONCESSIONAL_TOTAL, 0) - NVL(NUM_CONCESSIONAL_OCCUPIED, 0))
-        ) AS AVAILABLE_BEDS
+        ) AS AVAILABLE_B  EDS
      
     FROM AOHA_BEDAVAILABILITY_MAS
     WHERE NUM_BEDAVAILABILITY_ULBID = :ulbid
   `;
-    const binds = { ulbid: Number(ulbid || 0) };
+  const binds = { ulbid: Number(ulbid || 0) };
   const result = await executeQuery(sql, binds);
   return result.rows || [];
 }
