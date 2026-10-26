@@ -12,6 +12,8 @@ export default function SearchableSelect({
   labelKey = 'label',
   valueKey = 'value',
   id = 'searchable-select',
+  disabled = false,
+  className = '',
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -138,11 +140,12 @@ export default function SearchableSelect({
     >
       {/* Control / Trigger Box */}
       <div
-        className={`searchable-select-trigger ${isOpen ? 'open' : ''}`}
-        onClick={() => setIsOpen((prev) => !prev)}
-        tabIndex={0}
+        className={`searchable-select-trigger ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''} ${className}`}
+        onClick={() => !disabled && setIsOpen((prev) => !prev)}
+        tabIndex={disabled ? -1 : 0}
         role="combobox"
         aria-expanded={isOpen}
+        aria-disabled={disabled}
         aria-haspopup="listbox"
       >
         <span className="searchable-select-val">

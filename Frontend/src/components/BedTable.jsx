@@ -9,26 +9,50 @@ import { availabilityClass, columnTotals } from '../utils.js';
  * rows[category][quota] = { total, occupied }
  */
 export default function BedTable({ rows = [], mode = 'view', onChange, showHindi = false }) {
-  // Check if rows is in API format (array of objects with BED_CATEGORY)
+  const getCatName = (cat) =>
+    cat?.BED_CATEGORY ?? cat?.bed_category ?? cat?.VAR_BEDCATEGORY_NAME ?? cat?.var_bedcategory_name ?? cat?.name ?? '';
+
+  const toNum = (val) => {
+    if (val === undefined || val === null || val === '') return 0;
+    const n = Number(val);
+    return isNaN(n) ? 0 : n;
+  };
+
+  // Check if rows is in API format (array of objects with category or hospital properties)
   const isApiData =
     Array.isArray(rows) &&
     rows.length > 0 &&
     typeof rows[0] === 'object' &&
-    rows[0]?.BED_CATEGORY !== undefined;
+    !Array.isArray(rows[0]) &&
+    (
+      rows[0].BED_CATEGORY !== undefined ||
+      rows[0].bed_category !== undefined ||
+      rows[0].HOSPITAL_NAME !== undefined ||
+      rows[0].hospital_name !== undefined ||
+      rows[0].REGULAR_TOTAL !== undefined ||
+      rows[0].regular_total !== undefined
+    );
 
   if (isApiData) {
-    const categoryRows = rows.filter((r) => r.BED_CATEGORY !== 'Total');
-    const totalRow = rows.find((r) => r.BED_CATEGORY === 'Total') || {
+    const isTotal = (r) => {
+      const name = String(getCatName(r)).trim().toLowerCase();
+      return name === 'total' || name === 'एकूण';
+    };
+
+    const categoryRows = rows.filter((r) => !isTotal(r));
+    const totalRowFromData = rows.find((r) => isTotal(r));
+
+    const totalRow = totalRowFromData || {
       BED_CATEGORY: 'Total',
-      REGULAR_TOTAL: categoryRows.reduce((s, r) => s + (Number(r.REGULAR_TOTAL) || 0), 0),
-      REGULAR_OCCUPIED: categoryRows.reduce((s, r) => s + (Number(r.REGULAR_OCCUPIED) || 0), 0),
-      REGULAR_AVAILABLE: categoryRows.reduce((s, r) => s + (Number(r.REGULAR_AVAILABLE) || 0), 0),
-      RESERVED_TOTAL: categoryRows.reduce((s, r) => s + (Number(r.RESERVED_TOTAL) || 0), 0),
-      RESERVED_OCCUPIED: categoryRows.reduce((s, r) => s + (Number(r.RESERVED_OCCUPIED) || 0), 0),
-      RESERVED_AVAILABLE: categoryRows.reduce((s, r) => s + (Number(r.RESERVED_AVAILABLE) || 0), 0),
-      CONCESSIONAL_TOTAL: categoryRows.reduce((s, r) => s + (Number(r.CONCESSIONAL_TOTAL) || 0), 0),
-      CONCESSIONAL_OCCUPIED: categoryRows.reduce((s, r) => s + (Number(r.CONCESSIONAL_OCCUPIED) || 0), 0),
-      CONCESSIONAL_AVAILABLE: categoryRows.reduce((s, r) => s + (Number(r.CONCESSIONAL_AVAILABLE) || 0), 0),
+      REGULAR_TOTAL: categoryRows.reduce((s, r) => s + toNum(r.REGULAR_TOTAL ?? r.regular_total), 0),
+      REGULAR_OCCUPIED: categoryRows.reduce((s, r) => s + toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied), 0),
+      REGULAR_AVAILABLE: categoryRows.reduce((s, r) => s + toNum(r.REGULAR_AVAILABLE ?? r.regular_available ?? (toNum(r.REGULAR_TOTAL ?? r.regular_total) - toNum(r.REGULAR_OCCUPIED ?? r.regular_occupied))), 0),
+      RESERVED_TOTAL: categoryRows.reduce((s, r) => s + toNum(r.RESERVED_TOTAL ?? r.reserved_total), 0),
+      RESERVED_OCCUPIED: categoryRows.reduce((s, r) => s + toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied), 0),
+      RESERVED_AVAILABLE: categoryRows.reduce((s, r) => s + toNum(r.RESERVED_AVAILABLE ?? r.reserved_available ?? (toNum(r.RESERVED_TOTAL ?? r.reserved_total) - toNum(r.RESERVED_OCCUPIED ?? r.reserved_occupied))), 0),
+      CONCESSIONAL_TOTAL: categoryRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total), 0),
+      CONCESSIONAL_OCCUPIED: categoryRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied), 0),
+      CONCESSIONAL_AVAILABLE: categoryRows.reduce((s, r) => s + toNum(r.CONCESSIONAL_AVAILABLE ?? r.concessional_available ?? (toNum(r.CONCESSIONAL_TOTAL ?? r.concessional_total) - toNum(r.CONCESSIONAL_OCCUPIED ?? r.concessional_occupied))), 0),
     };
 
     return (
@@ -64,25 +88,32 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
               </tr>
             ) : (
               categoryRows.map((cat, idx) => {
-                const regTotal = Number(cat.REGULAR_TOTAL) || 0;
-                const regOcc = Number(cat.REGULAR_OCCUPIED) || 0;
-                const regAvail = Number(cat.REGULAR_AVAILABLE ?? (regTotal - regOcc));
+                const catName = getCatName(cat) || `Category ${idx + 1}`;
+                const regTotal = toNum(cat.REGULAR_TOTAL ?? cat.regular_total);
+                const regOcc = toNum(cat.REGULAR_OCCUPIED ?? cat.regular_occupied);
+                const regAvail = cat.REGULAR_AVAILABLE !== undefined
+                  ? toNum(cat.REGULAR_AVAILABLE)
+                  : (cat.regular_available !== undefined ? toNum(cat.regular_available) : regTotal - regOcc);
 
-                const resTotal = Number(cat.RESERVED_TOTAL) || 0;
-                const resOcc = Number(cat.RESERVED_OCCUPIED) || 0;
-                const resAvail = Number(cat.RESERVED_AVAILABLE ?? (resTotal - resOcc));
+                const resTotal = toNum(cat.RESERVED_TOTAL ?? cat.reserved_total);
+                const resOcc = toNum(cat.RESERVED_OCCUPIED ?? cat.reserved_occupied);
+                const resAvail = cat.RESERVED_AVAILABLE !== undefined
+                  ? toNum(cat.RESERVED_AVAILABLE)
+                  : (cat.reserved_available !== undefined ? toNum(cat.reserved_available) : resTotal - resOcc);
 
-                const conTotal = Number(cat.CONCESSIONAL_TOTAL) || 0;
-                const conOcc = Number(cat.CONCESSIONAL_OCCUPIED) || 0;
-                const conAvail = Number(cat.CONCESSIONAL_AVAILABLE ?? (conTotal - conOcc));
+                const conTotal = toNum(cat.CONCESSIONAL_TOTAL ?? cat.concessional_total);
+                const conOcc = toNum(cat.CONCESSIONAL_OCCUPIED ?? cat.concessional_occupied);
+                const conAvail = cat.CONCESSIONAL_AVAILABLE !== undefined
+                  ? toNum(cat.CONCESSIONAL_AVAILABLE)
+                  : (cat.concessional_available !== undefined ? toNum(cat.concessional_available) : conTotal - conOcc);
 
                 const regCls = availabilityClass(regTotal, regAvail);
                 const resCls = availabilityClass(resTotal, resAvail);
                 const conCls = availabilityClass(conTotal, conAvail);
 
                 return (
-                  <tr key={cat.BED_CATEGORY || idx}>
-                    <td className="l">{cat.BED_CATEGORY}</td>
+                  <tr key={catName || idx}>
+                    <td className="l">{catName}</td>
                     {/* Regular */}
                     <td>{regTotal}</td>
                     <td>{regOcc}</td>
@@ -104,17 +135,17 @@ export default function BedTable({ rows = [], mode = 'view', onChange, showHindi
             <tr>
               <td className="l">Total</td>
               {/* Regular Total */}
-              <td>{Number(totalRow.REGULAR_TOTAL) || 0}</td>
-              <td>{Number(totalRow.REGULAR_OCCUPIED) || 0}</td>
-              <td>{Number(totalRow.REGULAR_AVAILABLE ?? ((Number(totalRow.REGULAR_TOTAL) || 0) - (Number(totalRow.REGULAR_OCCUPIED) || 0)))}</td>
+              <td>{toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total)}</td>
+              <td>{toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied)}</td>
+              <td>{toNum(totalRow.REGULAR_AVAILABLE ?? totalRow.regular_available ?? (toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total) - toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied)))}</td>
               {/* Reserved Total */}
-              <td>{Number(totalRow.RESERVED_TOTAL) || 0}</td>
-              <td>{Number(totalRow.RESERVED_OCCUPIED) || 0}</td>
-              <td>{Number(totalRow.RESERVED_AVAILABLE ?? ((Number(totalRow.RESERVED_TOTAL) || 0) - (Number(totalRow.RESERVED_OCCUPIED) || 0)))}</td>
+              <td>{toNum(totalRow.RESERVED_TOTAL ?? totalRow.reserved_total)}</td>
+              <td>{toNum(totalRow.RESERVED_OCCUPIED ?? totalRow.reserved_occupied)}</td>
+              <td>{toNum(totalRow.RESERVED_AVAILABLE ?? totalRow.reserved_available ?? (toNum(totalRow.RESERVED_TOTAL ?? totalRow.reserved_total) - toNum(totalRow.RESERVED_OCCUPIED ?? totalRow.reserved_occupied)))}</td>
               {/* Concessional Total */}
-              <td>{Number(totalRow.CONCESSIONAL_TOTAL) || 0}</td>
-              <td>{Number(totalRow.CONCESSIONAL_OCCUPIED) || 0}</td>
-              <td>{Number(totalRow.CONCESSIONAL_AVAILABLE ?? ((Number(totalRow.CONCESSIONAL_TOTAL) || 0) - (Number(totalRow.CONCESSIONAL_OCCUPIED) || 0)))}</td>
+              <td>{toNum(totalRow.CONCESSIONAL_TOTAL ?? totalRow.concessional_total)}</td>
+              <td>{toNum(totalRow.CONCESSIONAL_OCCUPIED ?? totalRow.concessional_occupied)}</td>
+              <td>{toNum(totalRow.CONCESSIONAL_AVAILABLE ?? totalRow.concessional_available ?? (toNum(totalRow.CONCESSIONAL_TOTAL ?? totalRow.concessional_total) - toNum(totalRow.CONCESSIONAL_OCCUPIED ?? totalRow.concessional_occupied)))}</td>
             </tr>
           </tfoot>
         </table>
