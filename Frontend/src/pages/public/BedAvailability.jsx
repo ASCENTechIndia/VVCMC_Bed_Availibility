@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
 import SearchableSelect from '../../components/SearchableSelect.jsx';
@@ -7,14 +8,23 @@ import { formatDateTime } from '../../utils.js';
 
 export default function BedAvailability() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlHospitalId = searchParams.get('hospital_id');
 
   const [hospitalOptions, setHospitalOptions] = useState([]);
   const [loadingHospitals, setLoadingHospitals] = useState(true);
-  const [selectedId, setSelectedId] = useState(1);
+  const [selectedId, setSelectedId] = useState(() => (urlHospitalId ? Number(urlHospitalId) : ''));
   const [hospitalDetails, setHospitalDetails] = useState(null);
 
   const [bedList, setBedList] = useState([]);
   const [loadingBeds, setLoadingBeds] = useState(false);
+
+  // Sync selectedId if URL parameter changes
+  useEffect(() => {
+    if (urlHospitalId) {
+      setSelectedId(Number(urlHospitalId));
+    }
+  }, [urlHospitalId]);
 
   // Fetch hospital dropdown list from API
   const fetchDropdownHospitals = useCallback(async () => {
@@ -43,11 +53,15 @@ export default function BedAvailability() {
 
       if (formatted.length > 0) {
         setSelectedId((prev) => {
-          const exists = formatted.some((opt) => String(opt.value) === String(prev));
-          if (exists && prev !== '') return prev;
-
-          const hospital = formatted.find((opt) => Number(opt.value) === 1);
-          return hospital ? hospital.value : formatted[0].value;
+          if (urlHospitalId) {
+            const match = formatted.find((opt) => Number(opt.value) === Number(urlHospitalId));
+            if (match) return match.value;
+          }
+          if (prev && prev !== 0 && prev !== '') {
+            const match = formatted.find((opt) => Number(opt.value) === Number(prev));
+            if (match) return match.value;
+          }
+          return '';
         });
       }
     } catch (err) {
@@ -55,25 +69,25 @@ export default function BedAvailability() {
     } finally {
       setLoadingHospitals(false);
     }
-  }, [user?.ulbId, user?.ulbd]);
+  }, [user?.ulbId, user?.ulbd, urlHospitalId]);
 
   useEffect(() => {
     fetchDropdownHospitals();
   }, [fetchDropdownHospitals]);
 
   // Fetch bed availability list:
-  // if not hospital id is passed from the dropdown then pass null
+  // if no hospital id is selected then reset to empty
   const fetchBedAvailability = useCallback(async () => {
+    if (!selectedId || Number(selectedId) === 0) {
+      setBedList([]);
+      setLoadingBeds(false);
+      return;
+    }
     try {
       setLoadingBeds(true);
       const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
-      const hospitalIdPayload =
-        selectedId !== '' && selectedId !== null && selectedId !== undefined
-          ? Number(selectedId)
-          : null;
-
       const res = await post('/hospitalMst/bedAvailabilityList', {
-        hospitalId: hospitalIdPayload,
+        hospitalId: Number(selectedId),
         ulbId: targetUlbId,
       });
 
@@ -97,7 +111,7 @@ export default function BedAvailability() {
 
   // Fetch full details of selected hospital (when a specific hospital is chosen)
   useEffect(() => {
-    if (!selectedId) {
+    if (!selectedId || Number(selectedId) === 0) {
       setHospitalDetails(null);
       return;
     }
@@ -195,10 +209,10 @@ export default function BedAvailability() {
   const selectedHospital =
     hospitalOptions.find((h) => String(h.value) === String(selectedId)) || null;
 
-  const isAllHospitals = !selectedId || selectedId === '';
+  const isAllHospitals = !selectedId || selectedId === '' || Number(selectedId) === 0;
 
   const displayName = isAllHospitals
-    ? 'All Hospitals / सर्व रुग्णालये'
+    ? 'Select a Hospital / रुग्णालय निवडा'
     : hospitalDetails?.VAR_HOSPITAL_NAME ||
     selectedHospital?.label ||
     selectedHospital?.name ||
@@ -207,20 +221,20 @@ export default function BedAvailability() {
     'Hospital';
 
   const displayAddress = isAllHospitals
-    ? 'Vasai-Virar City Municipal Corporation Area'
+    ? ''
     : hospitalDetails?.VAR_HOSPITAL_ADDRESS ||
     (hospitalDetails?.VAR_HOSPITAL_AREA_WARD ? `Area: ${hospitalDetails.VAR_HOSPITAL_AREA_WARD}` : '') ||
     selectedHospital?.address ||
     'VVCMC Area';
 
   const displayPhone = isAllHospitals
-    ? 'VVCMC Helpline / हेल्पलाईन'
+    ? ''
     : hospitalDetails?.VAR_HOSPITAL_PHONE ||
     selectedHospital?.phone ||
     '-';
 
   const displayUpdated = isAllHospitals
-    ? new Date().toISOString()
+    ? null
     : hospitalDetails?.DAT_HOSPITAL_UPDDT ||
     hospitalDetails?.DAT_HOSPITAL_INSDT ||
     selectedHospital?.lastUpdated ||
@@ -228,6 +242,16 @@ export default function BedAvailability() {
 
   return (
     <main className="wrap">
+      {/* View Switcher Bar */}
+      <div className="view-switcher">
+        <Link to="/hospitaldashboard" title="Hospital Overview Dashboard">
+          🏥 रुग्णालयानुसार बेड (Hospital View)
+        </Link>
+        <Link to="/citizendashboard" className="active" title="Ward / Category Bed Dashboard">
+          🛏️ वॉर्ड / संवर्गानुसार बेड (Ward View)
+        </Link>
+      </div>
+
       <h1>
         रुग्णालय बेड उपलब्धता <small>Hospital Bed Availability</small>
       </h1>
@@ -245,7 +269,15 @@ export default function BedAvailability() {
             id="hospital-search-select"
             options={hospitalOptions}
             value={selectedId}
-            onChange={(newId) => setSelectedId(newId !== '' && newId !== null ? Number(newId) : '')}
+            onChange={(newId) => {
+              const val = newId !== '' && newId !== null ? Number(newId) : '';
+              setSelectedId(val);
+              if (val) {
+                setSearchParams({ hospital_id: String(val) }, { replace: true });
+              } else {
+                setSearchParams({}, { replace: true });
+              }
+            }}
             placeholder="Select Hospital / रुग्णालय निवडा"
             searchPlaceholder="Search by name / रुग्णालय शोधा..."
             labelKey="label"
@@ -261,11 +293,12 @@ export default function BedAvailability() {
       </div>
 
       <h2>{displayName}</h2>
-      <div className="meta">
-        <span>📍 {displayAddress}</span>
-        <span>📞 {displayPhone}</span>
-        <span>🕒 Last updated: {formatDateTime(displayUpdated)}</span>
-      </div>
+      {!isAllHospitals && (
+        <div className="meta">
+          {displayAddress && <span>📍 {displayAddress}</span>}
+          {displayPhone && <span>📞 {displayPhone}</span>}
+        </div>
+      )}
 
       <BedTable rows={bedList} mode="view" showHindi />
 

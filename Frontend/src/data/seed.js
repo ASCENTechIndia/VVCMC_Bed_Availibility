@@ -1,12 +1,14 @@
 export const CATEGORIES = [
-  { id: 1, name: 'Intensive Care Unit (ICU)' },
-  { id: 2, name: 'Neonatal ICU (NICU)' },
-  { id: 3, name: 'Pediatric ICU (PICU)' },
-  { id: 4, name: 'General Ward - Male' },
-  { id: 5, name: 'General Ward - Female' },
-  { id: 6, name: 'General Ward - Common/Combined' },
-  { id: 7, name: 'Deluxe/Special Rooms' },
-  { id: 8, name: 'Other (e.g. Casualty/ Day Care)' },
+  { id: 1, name: 'Maternity Room' },
+  { id: 2, name: 'Intensive Care Unit (ICU)' },
+  { id: 3, name: 'Neonatal ICU (NICU)' },
+  { id: 4, name: 'Pediatric ICU (PICU)' },
+  { id: 5, name: 'General Ward - Male' },
+  { id: 6, name: 'General Ward - Female' },
+  { id: 7, name: 'General Ward - Common/Combined' },
+  { id: 8, name: 'Deluxe/Special Rooms' },
+  { id: 9, name: 'Other (e.g. Casualty/ Day Care)' },
+  { id: 10, name: 'ICU Bed' },
 ];
 
 export const QUOTAS = [

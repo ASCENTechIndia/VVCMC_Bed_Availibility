@@ -6,6 +6,7 @@ import AuthLayout from './layouts/AuthLayout.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
 
 import BedAvailability from './pages/public/BedAvailability.jsx';
+import HospitalBedDashboard from './pages/public/HospitalBedDashboard.jsx';
 import Login from './pages/admin/Login.jsx';
 import Logout from './pages/admin/Logout.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
@@ -21,6 +22,7 @@ export default function App() {
       {/* Public citizen page */}
       <Route element={<PublicLayout />}>
         <Route path="/citizendashboard" element={<BedAvailability />} />
+        <Route path="/hospitaldashboard" element={<HospitalBedDashboard />} />
       </Route>
 
       {/* Admin and Auth Module */}

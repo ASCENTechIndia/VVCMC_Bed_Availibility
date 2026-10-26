@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { post } from '../../services/apiService.js';
 import Modal from '../../components/Modal.jsx';
+import { getIpAddress, getSource } from '../../utils/device.js';
 
 const PAGE_SIZE = 10;
 const DEFAULT_TYPES = ['Municipal', 'Government', 'Private', 'Trust'];
@@ -121,6 +122,11 @@ export default function HospitalList() {
       const targetHospitalId = Number(targetHospital.id || targetHospital.NUM_HOSPITAL_ID);
       const targetUlbId = Number(user?.ulbId || user?.ulbd || targetHospital.ulbid) || 790;
 
+      const [ipAddress, ipSource] = await Promise.all([
+        getIpAddress(),
+        Promise.resolve(getSource()),
+      ]);
+
       const payload = {
         userId: user?.userId || 'admin',
         hospitalId: targetHospitalId,
@@ -134,6 +140,8 @@ export default function HospitalList() {
         email: targetHospital.email || targetHospital.VAR_HOSPITAL_EMAIL || '',
         status: 'N',
         mode: 3,
+        ipAddress: ipAddress || '127.0.0.1',
+        ipSource: ipSource || 'RW',
       };
 
       const res = await post('/hospitalMst/insertHospital', payload);
@@ -167,6 +175,11 @@ export default function HospitalList() {
       const targetHospitalId = Number(hospital.id || hospital.NUM_HOSPITAL_ID);
       const targetUlbId = Number(user?.ulbId || user?.ulbd || hospital.ulbid) || 790;
 
+      const [ipAddress, ipSource] = await Promise.all([
+        getIpAddress(),
+        Promise.resolve(getSource()),
+      ]);
+
       const payload = {
         userId: user?.userId || 'admin',
         hospitalId: targetHospitalId,
@@ -180,6 +193,8 @@ export default function HospitalList() {
         email: hospital.email || hospital.VAR_HOSPITAL_EMAIL || '',
         status: 'Y',
         mode: 2,
+        ipAddress: ipAddress || '127.0.0.1',
+        ipSource: ipSource || 'RW',
       };
 
       const res = await post('/hospitalMst/insertHospital', payload);
