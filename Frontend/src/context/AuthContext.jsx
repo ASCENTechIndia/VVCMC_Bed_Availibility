@@ -283,10 +283,10 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       user,
-      currentUser: user, // Alias for compatibility
+      currentUser: user,
       token,
       isAuthenticated,
-      isAdmin: isAuthenticated, // Alias for compatibility with existing admin layout
+      isAdmin: isAuthenticated,
       sessionExpired,
       login,
       logout,

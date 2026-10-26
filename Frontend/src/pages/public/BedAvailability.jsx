@@ -18,6 +18,39 @@ export default function BedAvailability() {
 
   const [bedList, setBedList] = useState([]);
   const [loadingBeds, setLoadingBeds] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  // Fetch bed category master list from API
+  const fetchBedCategories = useCallback(async () => {
+    try {
+      const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
+      const res = await post('/hospitalMst/bedCategoryList', {
+        ulbid: targetUlbId
+      });
+
+      const raw = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+      const formatted = raw
+        .filter((item) => {
+          const status = String(item.VAR_BEDCATEGORY_STATUS ?? item.var_bedcategory_status ?? item.status ?? 'Y').toUpperCase().trim();
+          return status === 'Y';
+        })
+        .map((item) => ({
+          id: Number(item.NUM_BEDCATEGORY_ID ?? item.num_bedcategory_id ?? item.id),
+          name: item.VAR_BEDCATEGORY_NAME ?? item.var_bedcategory_name ?? item.name ?? '',
+          status: 'Y',
+          BED_CATEGORY: item.VAR_BEDCATEGORY_NAME ?? item.var_bedcategory_name ?? item.name ?? '',
+        }))
+        .filter((c) => c.id && c.name);
+
+      setCategories(formatted);
+    } catch (err) {
+      console.warn('Failed to load bed category master from API:', err);
+    }
+  }, [user?.ulbId, user?.ulbd]);
+
+  useEffect(() => {
+    fetchBedCategories();
+  }, [fetchBedCategories]);
 
   // Sync selectedId if URL parameter changes
   useEffect(() => {
@@ -97,7 +130,13 @@ export default function BedAvailability() {
           ? res
           : [];
 
-      setBedList(raw);
+      // Filter out any row where category status is 'N'
+      const activeRows = raw.filter((r) => {
+        const status = String(r.VAR_BEDCATEGORY_STATUS ?? r.var_bedcategory_status ?? r.status ?? 'Y').toUpperCase().trim();
+        return status !== 'N';
+      });
+
+      setBedList(activeRows);
     } catch (err) {
       console.error('Failed to load bed availability list:', err);
     } finally {
@@ -233,13 +272,6 @@ export default function BedAvailability() {
     selectedHospital?.phone ||
     '-';
 
-  const displayUpdated = isAllHospitals
-    ? null
-    : hospitalDetails?.DAT_HOSPITAL_UPDDT ||
-    hospitalDetails?.DAT_HOSPITAL_INSDT ||
-    selectedHospital?.lastUpdated ||
-    new Date().toISOString();
-
   return (
     <main className="wrap">
       {/* View Switcher Bar */}
@@ -300,7 +332,7 @@ export default function BedAvailability() {
         </div>
       )}
 
-      <BedTable rows={bedList} mode="view" showHindi />
+      <BedTable rows={bedList} mode="view" showHindi categories={categories} />
 
       <p className="legend">
         <span className="g">● Beds available</span> &nbsp; <span className="w">● Few beds left (20% or less)</span>{' '}
