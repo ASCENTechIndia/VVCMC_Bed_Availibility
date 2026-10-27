@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { post } from '../../services/apiService.js';
 import SearchableSelect from '../../components/SearchableSelect.jsx';
 import BedTable from '../../components/BedTable.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 
 export default function SelectHospital() {
   const { user } = useAuth();
@@ -259,6 +260,11 @@ export default function SelectHospital() {
 
   return (
     <>
+      <PageLoader
+        loading={loadingBeds || loading}
+        text={loadingBeds ? 'Loading bed availability details...' : 'Loading hospital list...'}
+        subtext="Please wait a moment..."
+      />
       <div className="ph">
         <div>
           <h1>Update Bed Status</h1>

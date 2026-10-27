@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
 import SearchableSelect from '../../components/SearchableSelect.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { post } from '../../services/apiService.js';
 import { formatDateTime } from '../../utils.js';
 
@@ -274,6 +275,12 @@ export default function BedAvailability() {
 
   return (
     <main className="wrap">
+      <PageLoader
+        loading={loadingBeds || (loadingHospitals && hospitalOptions.length === 0)}
+        text={loadingBeds ? 'Loading bed availability data...' : 'Loading hospital list...'}
+        subtext="कृपया प्रतीक्षा करा..."
+      />
+
       {/* View Switcher Bar */}
       <div className="view-switcher">
         <Link to="/hospitaldashboard" title="Hospital Overview Dashboard">

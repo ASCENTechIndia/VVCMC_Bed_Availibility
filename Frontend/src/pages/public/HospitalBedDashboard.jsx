@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
 import SearchableSelect from '../../components/SearchableSelect.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { post } from '../../services/apiService.js';
 
 export default function HospitalBedDashboard() {
@@ -224,6 +225,12 @@ export default function HospitalBedDashboard() {
           </button>
         </div>
       )}
+
+      <PageLoader
+        loading={loading}
+        text="Loading hospital bed availability..."
+        subtext="रुग्णालयनिहाय माहिती लोड होत आहे..."
+      />
 
       {loading ? (
         <div className="card" style={{ textAlign: 'center', padding: '40px', color: '#555' }}>

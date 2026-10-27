@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { post } from '../../services/apiService.js';
 import Modal from '../../components/Modal.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { inputHandlers, validateHospitalForm } from '../../validation/inputValidations.js';
 import { getIpAddress, getSource } from '../../utils/device.js';
 
@@ -189,6 +190,17 @@ export default function HospitalForm({ mode }) {
 
   return (
     <>
+      <PageLoader
+        loading={submitting || loading}
+        text={
+          submitting
+            ? isEdit
+              ? 'Updating hospital details...'
+              : 'Saving new hospital...'
+            : 'Loading hospital details...'
+        }
+        subtext={submitting ? 'Please wait while we save your changes...' : 'Please wait a moment...'}
+      />
       <div className="ph">
         <h1>{isEdit ? 'Update Hospital' : 'Add New Hospital'}</h1>
         <Link className="btn" to="/hospitals">&laquo; Back to list</Link>

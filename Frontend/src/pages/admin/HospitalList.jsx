@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { post } from '../../services/apiService.js';
 import Modal from '../../components/Modal.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { getIpAddress, getSource } from '../../utils/device.js';
 
 const PAGE_SIZE = 10;
@@ -244,6 +245,11 @@ export default function HospitalList() {
 
   return (
     <>
+      <PageLoader
+        loading={loading || deleting}
+        text={deleting ? 'Deleting hospital record...' : 'Loading hospital records...'}
+        subtext="Please wait a moment..."
+      />
       <div className="ph">
         <h1>Hospital Master</h1>
         <Link className="btn" to="/hospitals/add">+ Add New Hospital</Link>

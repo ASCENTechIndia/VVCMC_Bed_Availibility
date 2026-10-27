@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { post } from '../../services/apiService.js';
 import { formatDateTime, isToday } from '../../utils.js';
 
@@ -84,6 +85,11 @@ export default function Dashboard() {
 
   return (
     <>
+      <PageLoader
+        loading={loading}
+        text="Loading hospital update status..."
+        subtext="Fetching dashboard update records..."
+      />
       <div className="ph">
         <div>
           <h1>Dashboard</h1>
