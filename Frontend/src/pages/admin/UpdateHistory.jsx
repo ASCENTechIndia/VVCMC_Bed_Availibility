@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useData } from '../../context/DataContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { post } from '../../services/apiService.js';
 import { formatDateTime24 } from '../../utils.js';
 
@@ -200,6 +201,11 @@ export default function UpdateHistory() {
 
   return (
     <>
+      <PageLoader
+        loading={loadingHistory}
+        text="Loading activity logs..."
+        subtext="Fetching bed update history records..."
+      />
       <div className="ph">
         <div>
           <h1>Activity Log</h1>

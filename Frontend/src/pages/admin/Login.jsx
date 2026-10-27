@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { API_BASE_URL } from '../../services/apiService.js';
 import { getHostname, getIpAddress, getMacAddress, getSource } from '../../utils/device.js';
 
@@ -101,6 +102,11 @@ export default function Login() {
 
   return (
     <div className="lgbox">
+      <PageLoader
+        loading={loading}
+        text="Logging in..."
+        subtext="Verifying credentials and authenticating session..."
+      />
       <img src={LOGO} alt="VVCMC" />
       <h1>Admin Login</h1>
       <p className="sm">Hospital Bed Dashboard - Department users only</p>

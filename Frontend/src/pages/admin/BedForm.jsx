@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
 import Modal from '../../components/Modal.jsx';
+import PageLoader from '../../components/PageLoader.jsx';
 import { formatDateTime } from '../../utils.js';
 import { QUOTAS } from '../../data/seed.js';
 import { post } from '../../services/apiService.js';
@@ -212,9 +213,16 @@ export default function BedForm({ mode }) {
 
   if (loading && !hospital) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-        Loading hospital bed setup...
-      </div>
+      <>
+        <PageLoader
+          loading={true}
+          text="Loading hospital bed setup..."
+          subtext="Fetching category and quota details..."
+        />
+        <div className="card" style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+          Loading hospital bed setup...
+        </div>
+      </>
     );
   }
 
@@ -363,6 +371,11 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
 
   return (
     <>
+      <PageLoader
+        loading={saving}
+        text={isUpdate ? 'Saving bed status updates...' : 'Saving bed capacity...'}
+        subtext="Please do not close or refresh this page..."
+      />
       <div className="ph">
         <h1>{isUpdate ? 'Daily Bed Status Update' : 'Bed Capacity Setup'}</h1>
         <Link className="btn" to="/select-hospital">&laquo; Change hospital</Link>
