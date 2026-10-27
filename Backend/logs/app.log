@@ -1,0 +1,2 @@
+{"level":30,"time":1793076021337,"pid":11804,"hostname":"DESKTOP-P3JAJN9","dbName":"db1","msg":"Oracle pool initialized"}
+{"level":30,"time":1793076021369,"pid":11804,"hostname":"DESKTOP-P3JAJN9","port":5000,"env":"development","msg":"Server started"}
