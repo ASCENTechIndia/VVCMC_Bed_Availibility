@@ -17,6 +17,12 @@ export default function BedTable({
   isHospitalView = false,
   onHospitalClick,
 }) {
+  const isEditMode = mode === 'update' || mode === 'capacity';
+  const getQuotaKey = (q) => {
+    const k = q?.key || '';
+    if (k === 'Free') return 'reserved';
+    return k.toLowerCase();
+  };
   const getCatName = (cat) =>
     cat?.BED_CATEGORY ?? cat?.bed_category ?? cat?.VAR_BEDCATEGORY_NAME ?? cat?.var_bedcategory_name ?? cat?.name ?? '';
 
@@ -205,7 +211,7 @@ export default function BedTable({
 
     return (
       <div className="sc">
-        <table className="bt">
+        <table className={`bt ${isEditMode ? 'bed-edit-table' : ''}`}>
           <thead>
             <tr>
               <th rowSpan="2">
@@ -242,13 +248,19 @@ export default function BedTable({
                   )}
                 </th>
               )}
-              {QUOTAS.map((q) => (
-                <th key={q.id} colSpan="3">{q.label}</th>
-              ))}
+              {QUOTAS.map((q) => {
+                const qClass = isEditMode ? `q-head q-${getQuotaKey(q)}` : undefined;
+                return (
+                  <th key={q.id} colSpan="3" className={qClass}>{q.label}</th>
+                );
+              })}
             </tr>
             <tr>
               {QUOTAS.map((q) => (
-                <FragmentHeads key={q.id} />
+                <FragmentHeads
+                  key={q.id}
+                  quotaClass={isEditMode ? `q-${getQuotaKey(q)}` : undefined}
+                />
               ))}
             </tr>
           </thead>
@@ -361,10 +373,10 @@ export default function BedTable({
 
   return (
     <div className="sc">
-      <table className="bt">
+      <table className={`bt ${isEditMode ? 'bed-edit-table' : ''}`}>
         <thead>
           <tr>
-            <th rowSpan="2">
+            <th rowSpan="2" className={isEditMode ? 'bed-cat-head' : undefined}>
               Bed Category / Ward Type
               {showHindi && (
                 <>
@@ -373,13 +385,19 @@ export default function BedTable({
                 </>
               )}
             </th>
-            {QUOTAS.map((q) => (
-              <th key={q.id} colSpan="3">{q.label}</th>
-            ))}
+            {QUOTAS.map((q) => {
+              const qClass = isEditMode ? `q-head q-${getQuotaKey(q)}` : undefined;
+              return (
+                <th key={q.id} colSpan="3" className={qClass}>{q.label}</th>
+              );
+            })}
           </tr>
           <tr>
             {QUOTAS.map((q) => (
-              <FragmentHeads key={q.id} />
+              <FragmentHeads
+                key={q.id}
+                quotaClass={isEditMode ? `q-${getQuotaKey(q)}` : undefined}
+              />
             ))}
           </tr>
         </thead>
@@ -397,6 +415,7 @@ export default function BedTable({
                 {QUOTAS.map((q, qi) => {
                   const cell = safeRows[ci]?.[qi] || { total: 0, occupied: 0 };
                   const available = cell.total - cell.occupied;
+                  const qClass = isEditMode ? `q-${getQuotaKey(q)}` : undefined;
                   return (
                     <FragmentCells
                       key={q.id}
@@ -404,6 +423,7 @@ export default function BedTable({
                       available={available}
                       mode={mode}
                       name={`${cat.id}_${q.id}`}
+                      quotaClass={qClass}
                       onTotal={(v) => onChange && onChange(ci, qi, 'total', v)}
                       onOccupied={(v) => onChange && onChange(ci, qi, 'occupied', v)}
                     />
@@ -416,9 +436,13 @@ export default function BedTable({
         <tfoot>
           <tr>
             <td className="l">Total</td>
-            {grand.map((g, qi) => (
-              <FragmentTotals key={qi} total={g.total} occupied={g.occupied} />
-            ))}
+            {grand.map((g, qi) => {
+              const q = QUOTAS[qi];
+              const qClass = isEditMode ? `q-${getQuotaKey(q)}` : undefined;
+              return (
+                <FragmentTotals key={qi} total={g.total} occupied={g.occupied} quotaClass={qClass} />
+              );
+            })}
           </tr>
         </tfoot>
       </table>
@@ -426,39 +450,48 @@ export default function BedTable({
   );
 }
 
-function FragmentHeads() {
+function FragmentHeads({ quotaClass }) {
+  const cls = (sub) => (quotaClass ? `q-subhead ${quotaClass} ${sub}` : undefined);
   return (
     <>
-      <th>Total</th>
-      <th>Occupied</th>
-      <th>Available</th>
+      <th className={cls('col-total')}>Total</th>
+      <th className={cls('col-occupied')}>Occupied</th>
+      <th className={cls('col-available')}>Available</th>
     </>
   );
 }
 
-function FragmentTotals({ total, occupied }) {
+function FragmentTotals({ total, occupied, quotaClass }) {
+  const cls = (sub) => (quotaClass ? `q-foot ${quotaClass} ${sub}` : undefined);
   return (
     <>
-      <td>{total}</td>
-      <td>{occupied}</td>
-      <td>{total - occupied}</td>
+      <td className={cls('col-total')}>{total}</td>
+      <td className={cls('col-occupied')}>{occupied}</td>
+      <td className={cls('col-available')}>{total - occupied}</td>
     </>
   );
 }
 
-function FragmentCells({ cell, available, mode, name, onTotal, onOccupied }) {
+function FragmentCells({ cell, available, mode, name, quotaClass, onTotal, onOccupied }) {
   const cls = availabilityClass(cell.total, available);
   const num = (e) => Math.max(0, parseInt(e.target.value, 10) || 0);
+  const cellCls = (sub, extra = '') => {
+    const parts = [];
+    if (quotaClass) parts.push(quotaClass);
+    if (sub) parts.push(sub);
+    if (extra) parts.push(extra);
+    return parts.length > 0 ? parts.join(' ') : undefined;
+  };
   return (
     <>
-      <td>
+      <td className={cellCls('col-total')}>
         {mode === 'capacity' ? (
           <input type="number" min="0" name={`total_${name}`} value={cell.total} onChange={(e) => onTotal(num(e))} />
         ) : (
           cell.total
         )}
       </td>
-      <td>
+      <td className={cellCls('col-occupied')}>
         {mode === 'update' ? (
           <input
             type="number"
@@ -472,7 +505,7 @@ function FragmentCells({ cell, available, mode, name, onTotal, onOccupied }) {
           cell.occupied
         )}
       </td>
-      <td className={cls}>{available}</td>
+      <td className={cellCls('col-available', cls)}>{available}</td>
     </>
   );
 }

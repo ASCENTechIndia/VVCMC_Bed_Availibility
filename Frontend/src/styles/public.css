@@ -21,6 +21,21 @@ body {
    font-family: 'Noto Sans Devanagari', 'Segoe UI', Arial, sans-serif;
    color: var(--tx);
    background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
+   ;
    font-size: 15px
 }
 
@@ -182,7 +197,21 @@ input[type=tel] {
    border-radius: 4px;
    font: inherit;
    min-width: 210px;
-   background: #fff
+   background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
 }
 
 .btn {
@@ -225,6 +254,21 @@ input[type=tel] {
 
 .kpi div {
    background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
+   ;
    border: 1px solid var(--bd);
    border-left: 5px solid var(--navy);
    border-radius: 6px;
@@ -275,7 +319,21 @@ table.bt {
    border-collapse: collapse;
    width: 100%;
    min-width: 760px;
-   background: #fff
+   background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
 }
 
 .bt th,
@@ -302,13 +360,29 @@ table.bt {
    font-weight: 700
 }
 
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
+}
+
 .bt input {
    width: 70px;
    padding: 5px;
    text-align: center;
    border: 1px solid #9aa3c7;
    border-radius: 3px;
-   font: inherit
+   font: inherit;
+   -moz-appearance: textfield;
+   appearance: textfield;
 }
 
 .g {
@@ -439,6 +513,21 @@ footer b {
    gap: 10px;
    padding: 9px 12px;
    background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
+   ;
    border: 1px solid #9aa3c7;
    border-radius: 4px;
    cursor: pointer;
@@ -480,6 +569,21 @@ footer b {
    left: 0;
    right: 0;
    background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
+   ;
    border: 1px solid #9aa3c7;
    border-radius: 6px;
    box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
@@ -503,7 +607,21 @@ footer b {
    border: 1px solid #9aa3c7 !important;
    border-radius: 4px !important;
    font-size: 13px !important;
-   background: #fff !important
+   background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield !important;
 }
 
 .searchable-select-search input:focus {
@@ -608,6 +726,21 @@ footer b {
 
 .modal-box-wide {
    background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
+   ;
    border-radius: 10px;
    border-top: 5px solid var(--navy);
    padding: 24px;
@@ -666,6 +799,21 @@ footer b {
    border: 1px solid var(--navy);
    color: var(--navy);
    background: #fff;
+}
+
+/* Remove up/down spin buttons on number inputs globally */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input[type=number] {
+   -moz-appearance: textfield;
+   appearance: textfield;
+   ;
    transition: all .15s
 }
 
@@ -691,165 +839,193 @@ footer b {
 
 /* Full page loader & spinner overlay */
 .page-loader-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(15, 23, 42, 0.58);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  padding: 16px;
-  animation: page-loader-fade-in 0.2s ease-out forwards;
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   width: 100vw;
+   height: 100vh;
+   background: rgba(15, 23, 42, 0.58);
+   backdrop-filter: blur(5px);
+   -webkit-backdrop-filter: blur(5px);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 99999;
+   padding: 16px;
+   animation: page-loader-fade-in 0.2s ease-out forwards;
 }
 
 .page-loader-inline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  width: 100%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 30px;
+   width: 100%;
 }
 
 .page-loader-card {
-  position: relative;
-  background: #ffffff;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(216, 216, 252, 0.7);
-  padding: 28px 36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  min-width: 260px;
-  max-width: 400px;
-  text-align: center;
-  animation: page-loader-scale-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+   position: relative;
+   background: #ffffff;
+   border-radius: 14px;
+   overflow: hidden;
+   box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(216, 216, 252, 0.7);
+   padding: 28px 36px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   gap: 14px;
+   min-width: 260px;
+   max-width: 400px;
+   text-align: center;
+   animation: page-loader-scale-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .page-loader-card.is-transparent {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  padding: 10px !important;
+   background: transparent !important;
+   box-shadow: none !important;
+   border: none !important;
+   padding: 10px !important;
 }
 
 .page-loader-card.is-transparent .page-loader-title {
-  color: #ffffff !important;
+   color: #ffffff !important;
 }
 
 .page-loader-card.is-transparent .page-loader-subtext {
-  color: #cbd5e1 !important;
+   color: #cbd5e1 !important;
 }
 
 .page-loader-card.is-transparent .page-loader-bar {
-  display: none !important;
+   display: none !important;
 }
 
 .page-loader-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #2c3b73 0%, #4bb9ec 50%, #fdbf00 100%);
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   height: 4px;
+   background: linear-gradient(90deg, #2c3b73 0%, #4bb9ec 50%, #fdbf00 100%);
 }
 
 .page-loader-spinner-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+   position: relative;
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
 
 .page-loader-spinner-svg {
-  animation: page-loader-spin 1.4s linear infinite;
-  transform-origin: center;
+   animation: page-loader-spin 1.4s linear infinite;
+   transform-origin: center;
 }
 
 .page-loader-spinner-track {
-  stroke: #e2e8f0;
+   stroke: #e2e8f0;
 }
 
 .page-loader-spinner-arc {
-  stroke: #2c3b73;
-  animation: page-loader-dash 1.4s ease-in-out infinite;
+   stroke: #2c3b73;
+   animation: page-loader-dash 1.4s ease-in-out infinite;
 }
 
 .page-loader-pulse-dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  background: #fdbf00;
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(253, 191, 0, 0.8);
-  transform: translate(-50%, -50%);
-  animation: page-loader-pulse 1.4s ease-in-out infinite;
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   width: 10px;
+   height: 10px;
+   background: #fdbf00;
+   border-radius: 50%;
+   box-shadow: 0 0 8px rgba(253, 191, 0, 0.8);
+   transform: translate(-50%, -50%);
+   animation: page-loader-pulse 1.4s ease-in-out infinite;
 }
 
 .page-loader-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 4px;
 }
 
 .page-loader-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #2c3b73;
-  margin: 0;
-  line-height: 1.4;
+   font-size: 15px;
+   font-weight: 600;
+   color: #2c3b73;
+   margin: 0;
+   line-height: 1.4;
 }
 
 .page-loader-subtext {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.4;
+   font-size: 13px;
+   color: #64748b;
+   margin: 0;
+   line-height: 1.4;
 }
 
 @keyframes page-loader-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+   0% {
+      transform: rotate(0deg);
+   }
+
+   100% {
+      transform: rotate(360deg);
+   }
 }
 
 @keyframes page-loader-dash {
-  0% {
-    stroke-dasharray: 1, 150;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -35;
-  }
-  100% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -124;
-  }
+   0% {
+      stroke-dasharray: 1, 150;
+      stroke-dashoffset: 0;
+   }
+
+   50% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -35;
+   }
+
+   100% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -124;
+   }
 }
 
 @keyframes page-loader-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+   from {
+      opacity: 0;
+   }
+
+   to {
+      opacity: 1;
+   }
 }
 
 @keyframes page-loader-scale-in {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
+   from {
+      opacity: 0;
+      transform: scale(0.92);
+   }
+
+   to {
+      opacity: 1;
+      transform: scale(1);
+   }
 }
 
 @keyframes page-loader-pulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.6; }
-  50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-}
+
+   0%,
+   100% {
+      transform: translate(-50%, -50%) scale(0.85);
+      opacity: 0.6;
+   }
+
+   50% {
+      transform: translate(-50%, -50%) scale(1.15);
+      opacity: 1;
+   }
+}
