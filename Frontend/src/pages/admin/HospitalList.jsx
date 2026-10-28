@@ -264,7 +264,7 @@ export default function HospitalList() {
         }}
       >
         <div>
-          <label htmlFor="q">Search name / area</label>
+          <label htmlFor="q">Search name </label>
           <input type="text" id="q" name="q" value={draft.q} onChange={set('q')} />
         </div>
         <div>
