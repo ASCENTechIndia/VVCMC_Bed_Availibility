@@ -9,6 +9,8 @@ import { getIpAddress, getSource } from '../../utils/device.js';
 
 const BASE_TYPES = ['Municipal', 'Government', 'Private', 'Trust'];
 
+const WARD_OPTIONS = ['Ward A', 'Ward B', 'Ward C', 'Ward D', 'Ward E', 'Ward F', 'Ward G', 'Ward H', 'Ward I'];
+
 const EMPTY = {
   id: 0,
   name: '',
@@ -293,14 +295,18 @@ export default function HospitalForm({ mode }) {
             </div>
             <div>
               <label htmlFor="ar">Area / Ward</label>
-              <input
-                type="text"
+              <select
                 id="ar"
                 name="area_ward"
                 value={form.area}
                 onChange={set('area')}
                 disabled={submitting}
-              />
+              >
+                <option value="">-- Select Ward --</option>
+                {WARD_OPTIONS.map((w) => (
+                  <option key={w} value={w}>{w}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="pn">Pincode (6 digits) *</label>
