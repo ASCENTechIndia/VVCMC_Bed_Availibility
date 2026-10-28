@@ -1029,3 +1029,180 @@ input[type=number] {
       opacity: 1;
    }
 }
+
+/* ============================================================
+   Bed Quota Tables: Quota Column Color Coding (All Pages)
+   ============================================================ */
+
+.bt.bed-quota-table,
+.bt.bed-edit-table {
+  border: 1px solid #7a8cb8;
+}
+
+/* Category column header */
+.bt th.bed-cat-head {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* Header typography */
+.bt th.q-head {
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 9px 8px;
+  letter-spacing: 0.2px;
+}
+
+.bt th.q-subhead {
+  color: #ffffff !important;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 4px;
+}
+
+/* ------------------------------------------------------------
+   1. Regular Beds (Deep Navy / Blue)
+   ------------------------------------------------------------ */
+.bt th.q-head.q-regular {
+  background: #1e3a8a !important;
+  border-color: #172554 !important;
+}
+
+.bt th.q-subhead.q-regular {
+  background: #2b4c9f !important;
+  border-color: #1e3a8a !important;
+}
+
+.bt td.q-regular {
+  background: #f1f5fd;
+  border-color: #c5d5ec;
+}
+
+.bt tbody tr:hover td.q-regular {
+  background: #e4eefb;
+}
+
+.bt tfoot td.q-regular {
+  background: #dbe7f9 !important;
+  color: #1e3a8a !important;
+  font-weight: 700;
+  border-color: #b7cced !important;
+}
+
+.bt .q-regular.col-total {
+  border-left: 2.5px solid #2b4c9f !important;
+}
+
+.bt td.q-regular input {
+  background: #ffffff;
+  border: 1.5px solid #8da9db;
+  color: #1e293b;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.bt td.q-regular input:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.28);
+  outline: none;
+}
+
+/* ------------------------------------------------------------
+   2. 10% Reserved Free Beds (Indigent) (Deep Emerald Green)
+   ------------------------------------------------------------ */
+.bt th.q-head.q-reserved {
+  background: #065f46 !important;
+  border-color: #022c22 !important;
+}
+
+.bt th.q-subhead.q-reserved {
+  background: #0d7a5b !important;
+  border-color: #065f46 !important;
+}
+
+.bt td.q-reserved {
+  background: #edf8f2;
+  border-color: #bce6cf;
+}
+
+.bt tbody tr:hover td.q-reserved {
+  background: #def3e6;
+}
+
+.bt tfoot td.q-reserved {
+  background: #d4f4e2 !important;
+  color: #065f46 !important;
+  font-weight: 700;
+  border-color: #aae4c4 !important;
+}
+
+.bt .q-reserved.col-total {
+  border-left: 2.5px solid #0d7a5b !important;
+}
+
+.bt td.q-reserved input {
+  background: #ffffff;
+  border: 1.5px solid #6ec49b;
+  color: #1e293b;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.bt td.q-reserved input:focus {
+  border-color: #065f46;
+  box-shadow: 0 0 0 2px rgba(6, 95, 70, 0.28);
+  outline: none;
+}
+
+/* ------------------------------------------------------------
+   3. 10% Concessional Beds (Weaker Section) (Deep Royal Purple)
+   ------------------------------------------------------------ */
+.bt th.q-head.q-concessional {
+  background: #581c87 !important;
+  border-color: #3b0764 !important;
+}
+
+.bt th.q-subhead.q-concessional {
+  background: #7029ab !important;
+  border-color: #581c87 !important;
+}
+
+.bt td.q-concessional {
+  background: #f8f2fd;
+  border-color: #dbc3f3;
+}
+
+.bt tbody tr:hover td.q-concessional {
+  background: #eedaf9;
+}
+
+.bt tfoot td.q-concessional {
+  background: #ebd8f9 !important;
+  color: #581c87 !important;
+  font-weight: 700;
+  border-color: #d1b4f2 !important;
+}
+
+.bt .q-concessional.col-total {
+  border-left: 2.5px solid #7029ab !important;
+}
+
+.bt td.q-concessional input {
+  background: #ffffff;
+  border: 1.5px solid #b388e6;
+  color: #1e293b;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.bt td.q-concessional input:focus {
+  border-color: #581c87;
+  box-shadow: 0 0 0 2px rgba(88, 28, 135, 0.28);
+  outline: none;
+}

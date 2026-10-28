@@ -211,10 +211,10 @@ export default function BedTable({
 
     return (
       <div className="sc">
-        <table className={`bt ${isEditMode ? 'bed-edit-table' : ''}`}>
+        <table className={`bt bed-quota-table ${isEditMode ? 'bed-edit-table' : ''}`}>
           <thead>
             <tr>
-              <th rowSpan="2">
+              <th rowSpan="2" className="bed-cat-head">
                 {isHospitalView ? (
                   <>
                     Hospital Name
@@ -249,9 +249,9 @@ export default function BedTable({
                 </th>
               )}
               {QUOTAS.map((q) => {
-                const qClass = isEditMode ? `q-head q-${getQuotaKey(q)}` : undefined;
+                const qKey = getQuotaKey(q);
                 return (
-                  <th key={q.id} colSpan="3" className={qClass}>{q.label}</th>
+                  <th key={q.id} colSpan="3" className={`q-head q-${qKey}`}>{q.label}</th>
                 );
               })}
             </tr>
@@ -259,7 +259,7 @@ export default function BedTable({
               {QUOTAS.map((q) => (
                 <FragmentHeads
                   key={q.id}
-                  quotaClass={isEditMode ? `q-${getQuotaKey(q)}` : undefined}
+                  quotaClass={`q-${getQuotaKey(q)}`}
                 />
               ))}
             </tr>
@@ -318,17 +318,17 @@ export default function BedTable({
                     </td>
                     {isHospitalView && <td><b>{catCount}</b></td>}
                     {/* Regular */}
-                    <td>{regTotal}</td>
-                    <td>{regOcc}</td>
-                    <td className={regCls}>{regAvail}</td>
+                    <td className="q-regular col-total">{regTotal}</td>
+                    <td className="q-regular col-occupied">{regOcc}</td>
+                    <td className={`q-regular col-available ${regCls}`}>{regAvail}</td>
                     {/* Reserved */}
-                    <td>{resTotal}</td>
-                    <td>{resOcc}</td>
-                    <td className={resCls}>{resAvail}</td>
+                    <td className="q-reserved col-total">{resTotal}</td>
+                    <td className="q-reserved col-occupied">{resOcc}</td>
+                    <td className={`q-reserved col-available ${resCls}`}>{resAvail}</td>
                     {/* Concessional */}
-                    <td>{conTotal}</td>
-                    <td>{conOcc}</td>
-                    <td className={conCls}>{conAvail}</td>
+                    <td className="q-concessional col-total">{conTotal}</td>
+                    <td className="q-concessional col-occupied">{conOcc}</td>
+                    <td className={`q-concessional col-available ${conCls}`}>{conAvail}</td>
                   </tr>
                 );
               })
@@ -339,17 +339,17 @@ export default function BedTable({
               <td className="l">Total</td>
               {isHospitalView && <td><b>{totalCategoryCount}</b></td>}
               {/* Regular Total */}
-              <td>{toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total)}</td>
-              <td>{toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied)}</td>
-              <td>{toNum(totalRow.REGULAR_AVAILABLE ?? totalRow.regular_available ?? (toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total) - toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied)))}</td>
+              <td className="q-foot q-regular col-total">{toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total)}</td>
+              <td className="q-foot q-regular col-occupied">{toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied)}</td>
+              <td className="q-foot q-regular col-available">{toNum(totalRow.REGULAR_AVAILABLE ?? totalRow.regular_available ?? (toNum(totalRow.REGULAR_TOTAL ?? totalRow.regular_total) - toNum(totalRow.REGULAR_OCCUPIED ?? totalRow.regular_occupied)))}</td>
               {/* Reserved Total */}
-              <td>{toNum(totalRow.RESERVED_TOTAL ?? totalRow.reserved_total)}</td>
-              <td>{toNum(totalRow.RESERVED_OCCUPIED ?? totalRow.reserved_occupied)}</td>
-              <td>{toNum(totalRow.RESERVED_AVAILABLE ?? totalRow.reserved_available ?? (toNum(totalRow.RESERVED_TOTAL ?? totalRow.reserved_total) - toNum(totalRow.RESERVED_OCCUPIED ?? totalRow.reserved_occupied)))}</td>
+              <td className="q-foot q-reserved col-total">{toNum(totalRow.RESERVED_TOTAL ?? totalRow.reserved_total)}</td>
+              <td className="q-foot q-reserved col-occupied">{toNum(totalRow.RESERVED_OCCUPIED ?? totalRow.reserved_occupied)}</td>
+              <td className="q-foot q-reserved col-available">{toNum(totalRow.RESERVED_AVAILABLE ?? totalRow.reserved_available ?? (toNum(totalRow.RESERVED_TOTAL ?? totalRow.reserved_total) - toNum(totalRow.RESERVED_OCCUPIED ?? totalRow.reserved_occupied)))}</td>
               {/* Concessional Total */}
-              <td>{toNum(totalRow.CONCESSIONAL_TOTAL ?? totalRow.concessional_total)}</td>
-              <td>{toNum(totalRow.CONCESSIONAL_OCCUPIED ?? totalRow.concessional_occupied)}</td>
-              <td>{toNum(totalRow.CONCESSIONAL_AVAILABLE ?? totalRow.concessional_available ?? (toNum(totalRow.CONCESSIONAL_TOTAL ?? totalRow.concessional_total) - toNum(totalRow.CONCESSIONAL_OCCUPIED ?? totalRow.concessional_occupied)))}</td>
+              <td className="q-foot q-concessional col-total">{toNum(totalRow.CONCESSIONAL_TOTAL ?? totalRow.concessional_total)}</td>
+              <td className="q-foot q-concessional col-occupied">{toNum(totalRow.CONCESSIONAL_OCCUPIED ?? totalRow.concessional_occupied)}</td>
+              <td className="q-foot q-concessional col-available">{toNum(totalRow.CONCESSIONAL_AVAILABLE ?? totalRow.concessional_available ?? (toNum(totalRow.CONCESSIONAL_TOTAL ?? totalRow.concessional_total) - toNum(totalRow.CONCESSIONAL_OCCUPIED ?? totalRow.concessional_occupied)))}</td>
             </tr>
           </tfoot>
         </table>
@@ -373,10 +373,10 @@ export default function BedTable({
 
   return (
     <div className="sc">
-      <table className={`bt ${isEditMode ? 'bed-edit-table' : ''}`}>
+      <table className={`bt bed-quota-table ${isEditMode ? 'bed-edit-table' : ''}`}>
         <thead>
           <tr>
-            <th rowSpan="2" className={isEditMode ? 'bed-cat-head' : undefined}>
+            <th rowSpan="2" className="bed-cat-head">
               Bed Category / Ward Type
               {showHindi && (
                 <>
@@ -386,9 +386,9 @@ export default function BedTable({
               )}
             </th>
             {QUOTAS.map((q) => {
-              const qClass = isEditMode ? `q-head q-${getQuotaKey(q)}` : undefined;
+              const qKey = getQuotaKey(q);
               return (
-                <th key={q.id} colSpan="3" className={qClass}>{q.label}</th>
+                <th key={q.id} colSpan="3" className={`q-head q-${qKey}`}>{q.label}</th>
               );
             })}
           </tr>
@@ -396,7 +396,7 @@ export default function BedTable({
             {QUOTAS.map((q) => (
               <FragmentHeads
                 key={q.id}
-                quotaClass={isEditMode ? `q-${getQuotaKey(q)}` : undefined}
+                quotaClass={`q-${getQuotaKey(q)}`}
               />
             ))}
           </tr>
@@ -415,7 +415,7 @@ export default function BedTable({
                 {QUOTAS.map((q, qi) => {
                   const cell = safeRows[ci]?.[qi] || { total: 0, occupied: 0 };
                   const available = cell.total - cell.occupied;
-                  const qClass = isEditMode ? `q-${getQuotaKey(q)}` : undefined;
+                  const qClass = `q-${getQuotaKey(q)}`;
                   return (
                     <FragmentCells
                       key={q.id}
@@ -438,7 +438,7 @@ export default function BedTable({
             <td className="l">Total</td>
             {grand.map((g, qi) => {
               const q = QUOTAS[qi];
-              const qClass = isEditMode ? `q-${getQuotaKey(q)}` : undefined;
+              const qClass = `q-${getQuotaKey(q)}`;
               return (
                 <FragmentTotals key={qi} total={g.total} occupied={g.occupied} quotaClass={qClass} />
               );
