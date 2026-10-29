@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useData } from '../../context/DataContext.jsx';
 import BedTable from '../../components/BedTable.jsx';
@@ -241,6 +241,7 @@ export default function BedForm({ mode }) {
 }
 
 function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, user }) {
+  const navigate = useNavigate();
   const [rows, setRows] = useState(() => clone(stored));
   const [cats, setCats] = useState(categories || []);
   const [msg, setMsg] = useState(null);
@@ -256,22 +257,40 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
   }, [stored, categories]);
 
   const onChange = (ci, qi, field, value) => {
-    setMsg(null);
     setRows((prev) => {
       const next = clone(prev);
       next[ci][qi][field] = value;
-      if (isUpdate) {
-        next[ci][qi].occupied = Math.min(next[ci][qi].occupied, next[ci][qi].total);
+
+      const cell = next[ci]?.[qi];
+      if (cell && Number(cell.total) < Number(cell.occupied)) {
+        const alertText = 'Total number of beds should not be less than occupied number of beds';
+        setModalMessage(alertText);
+        setModalType('warning');
+        setModalOpen(true);
       }
+
       return next;
     });
   };
 
+  const onBlur = (ci, qi) => {
+    const cell = rows[ci]?.[qi];
+    if (cell && Number(cell.total) < Number(cell.occupied)) {
+      const alertText = 'Total number of beds should not be less than occupied number of beds';
+      setModalMessage(alertText);
+      setModalType('warning');
+      setModalOpen(true);
+    }
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    const bad = rows.some((r) => r.some((c) => c.occupied > c.total));
-    if (bad) {
-      setMsg({ type: 'err', text: 'Occupied cannot exceed Total for any category / quota. Please correct and retry.' });
+    const hasInvalidBeds = rows.some((r) => r.some((c) => Number(c.total) < Number(c.occupied)));
+    if (hasInvalidBeds) {
+      const alertText = 'Total number of beds should not be less than occupied number of beds';
+      setModalMessage(alertText);
+      setModalType('warning');
+      setModalOpen(true);
       return;
     }
 
@@ -287,8 +306,32 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
         Promise.resolve(getSource()),
       ]);
 
-      // Post updates to backend insertBedAvailability for each category
-      const requests = rows.map(async (catRow, ci) => {
+      // Filter only rows whose data has changed compared to stored
+      const changedRows = rows
+        .map((catRow, ci) => ({ catRow, ci }))
+        .filter(({ catRow, ci }) => {
+          const originalRow = stored?.[ci];
+          if (!originalRow) return true;
+          return catRow.some((c, qi) => {
+            const orig = originalRow[qi] || { total: 0, occupied: 0 };
+            return (
+              Number(c?.total || 0) !== Number(orig?.total || 0) ||
+              Number(c?.occupied || 0) !== Number(orig?.occupied || 0)
+            );
+          });
+        });
+
+      if (changedRows.length === 0) {
+        const noChangeMsg = 'No changes to save.';
+        setMsg({ type: 'ok', text: noChangeMsg });
+        setModalMessage(noChangeMsg);
+        setModalType('success');
+        setModalOpen(true);
+        return;
+      }
+
+      // Post updates to backend insertBedAvailability only for changed categories
+      const requests = changedRows.map(async ({ catRow, ci }) => {
         const cat = cats[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
         const reg = catRow[0] || { total: 0, occupied: 0 };
         const res = catRow[1] || { total: 0, occupied: 0 };
@@ -391,26 +434,31 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
         )}
       </div> */}
       {msg && <div className={`alert ${msg.type}`}>{msg.text}</div>}
-        <form onSubmit={onSubmit} className="bed-edit-form">
-          <BedTable rows={rows} mode={mode} onChange={onChange} categories={cats} />
-          <p className="actions">
-            <button className="btn y" type="submit" disabled={saving}>
-              {saving ? 'Saving...' : isUpdate ? 'Save' : 'Save Capacity'}
-            </button>{' '}
-            <Link className="btn g2" to="/select-hospital">Cancel</Link>
-          </p>
-          <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
-        </form>
+      <form onSubmit={onSubmit} className="bed-edit-form">
+        <BedTable rows={rows} mode={mode} onChange={onChange} onBlur={onBlur} categories={cats} />
+        <p className="actions">
+          <button className="btn y" type="submit" disabled={saving}>
+            {saving ? 'Saving...' : isUpdate ? 'Save' : 'Save Capacity'}
+          </button>{' '}
+          <Link className="btn g2" to="/select-hospital">Cancel</Link>
+        </p>
+        <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
+      </form>
 
-        {/* Response Modal */}
-        <Modal
-          isOpen={modalOpen}
-          type={modalType}
-          title={modalType === 'success' ? 'Success' : 'Notice'}
-          message={modalMessage}
-          onOk={() => setModalOpen(false)}
-          okText="OK"
-        />
-      </>
-      );
+      {/* Response Modal */}
+      <Modal
+        isOpen={modalOpen}
+        type={modalType}
+        title={modalType === 'success' ? 'Success' : 'Notice'}
+        message={modalMessage}
+        onOk={() => {
+          setModalOpen(false);
+          if (modalType === 'success') {
+            navigate('/select-hospital');
+          }
+        }}
+        okText="OK"
+      />
+    </>
+  );
 }
