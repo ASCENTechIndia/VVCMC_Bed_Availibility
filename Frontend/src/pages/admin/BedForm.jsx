@@ -260,74 +260,104 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
     setRows((prev) => {
       const next = clone(prev);
       next[ci][qi][field] = value;
-      if (isUpdate) {
-        next[ci][qi].occupied = Math.min(next[ci][qi].occupied, next[ci][qi].total);
-      }
       return next;
     });
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const bad = rows.some((r) => r.some((c) => c.occupied > c.total));
-    if (bad) {
-      setMsg({ type: 'err', text: 'Occupied cannot exceed Total for any category / quota. Please correct and retry.' });
-      return;
-    }
+      const hasInvalidBeds = rows.some((r) => r.some((c) => Number(c.total) < Number(c.occupied)));
+      if (hasInvalidBeds) {
+        const alertText = 'Total number of beds should not be less than occupied number of beds';
+        setMsg({ type: 'err', text: alertText });
+        setModalMessage(alertText);
+        setModalType('warning');
+        setModalOpen(true);
+        return;
+      }
 
-    setSaving(true);
-    setMsg(null);
+      setSaving(true);
+      setMsg(null);
 
-    try {
-      const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
-      const targetUserId = user?.userId || user?.username || 'admin';
+      try {
+        const targetUlbId = Number(user?.ulbId || user?.ulbd) || 790;
+        const targetUserId = user?.userId || user?.username || 'admin';
 
-      const [ipAddress, ipSource] = await Promise.all([
-        getIpAddress(),
-        Promise.resolve(getSource()),
-      ]);
+        const [ipAddress, ipSource] = await Promise.all([
+          getIpAddress(),
+          Promise.resolve(getSource()),
+        ]);
 
-      // Post updates to backend insertBedAvailability for each category
-      const requests = rows.map(async (catRow, ci) => {
-        const cat = cats[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
-        const reg = catRow[0] || { total: 0, occupied: 0 };
-        const res = catRow[1] || { total: 0, occupied: 0 };
-        const con = catRow[2] || { total: 0, occupied: 0 };
+        // Post updates to backend insertBedAvailability for each category
+        const requests = rows.map(async (catRow, ci) => {
+          const cat = cats[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
+          const reg = catRow[0] || { total: 0, occupied: 0 };
+          const res = catRow[1] || { total: 0, occupied: 0 };
+          const con = catRow[2] || { total: 0, occupied: 0 };
 
-        const availId = Number(cat.BEDAVAIL_ID || cat.bedAvailabilityId || 0);
-        const modeVal = availId > 0 ? 2 : 1;
+          const availId = Number(cat.BEDAVAIL_ID || cat.bedAvailabilityId || 0);
+          const modeVal = availId > 0 ? 2 : 1;
 
-        const payload = {
-          userId: targetUserId,
-          bedAvailabilityId: availId,
-          ulbId: targetUlbId,
-          hospitalId: Number(hospital.id),
-          bedCategoryId: Number(cat.id),
-          regularTotal: Number(reg.total || 0),
-          regularOccupied: Number(reg.occupied || 0),
-          reservedTotal: Number(res.total || 0),
-          reservedOccupied: Number(res.occupied || 0),
-          concessionalTotal: Number(con.total || 0),
-          concessionalOccupied: Number(con.occupied || 0),
-          status: 'Y',
-          mode: modeVal,
-          ipAddress: ipAddress || '127.0.0.1',
-          ipSource: ipSource || 'RW',
-        };
+          const payload = {
+            userId: targetUserId,
+            bedAvailabilityId: availId,
+            ulbId: targetUlbId,
+            hospitalId: Number(hospital.id),
+            bedCategoryId: Number(cat.id),
+            regularTotal: Number(reg.total || 0),
+            regularOccupied: Number(reg.occupied || 0),
+            reservedTotal: Number(res.total || 0),
+            reservedOccupied: Number(res.occupied || 0),
+            concessionalTotal: Number(con.total || 0),
+            concessionalOccupied: Number(con.occupied || 0),
+            status: 'Y',
+            mode: modeVal,
+            ipAddress: ipAddress || '127.0.0.1',
+            ipSource: ipSource || 'RW',
+          };
 
-        const resData = await post('/hospitalMst/insertBedAvailability', payload);
-        return { cat, payload, resData };
-      });
+          const resData = await post('/hospitalMst/insertBedAvailability', payload);
+          return { cat, payload, resData };
+        });
 
-      const results = await Promise.all(requests);
+        const results = await Promise.all(requests);
 
-      const failed = results.filter(
-        (r) => r?.resData?.data?.errorCode && r.resData.data.errorCode !== 9999
-      );
+        const failed = results.filter(
+          (r) => r?.resData?.data?.errorCode && r.resData.data.errorCode !== 9999
+        );
 
-      if (failed.length > 0) {
-        const firstErr = failed[0]?.resData?.data?.message || 'Failed to update some bed categories.';
-        const errText = `${firstErr} (${failed.length} categories failed)`;
+        if (failed.length > 0) {
+          const firstErr = failed[0]?.resData?.data?.message || 'Failed to update some bed categories.';
+          const errText = `${firstErr} (${failed.length} categories failed)`;
+          setMsg({
+            type: 'err',
+            text: errText,
+          });
+          setModalMessage(errText);
+          setModalType('warning');
+          setModalOpen(true);
+        } else {
+          const successMessage =
+            results[0]?.resData?.data?.message || results[0]?.resData?.message || 'Data Updated Successfully';
+          setMsg({
+            type: 'ok',
+            text: successMessage,
+          });
+          setModalMessage(successMessage);
+          setModalType('success');
+          setModalOpen(true);
+
+          if (onRefresh) {
+            onRefresh();
+          }
+        }
+
+        if (onSave) {
+          onSave(hospital.id, rows);
+        }
+      } catch (err) {
+        console.error('Failed to save bed availability:', err);
+        const errText = err?.message || 'Failed to save bed availability.';
         setMsg({
           type: 'err',
           text: errText,
@@ -335,62 +365,33 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
         setModalMessage(errText);
         setModalType('warning');
         setModalOpen(true);
-      } else {
-        const successMessage =
-          results[0]?.resData?.data?.message || results[0]?.resData?.message || 'Data Updated Successfully';
-        setMsg({
-          type: 'ok',
-          text: successMessage,
-        });
-        setModalMessage(successMessage);
-        setModalType('success');
-        setModalOpen(true);
-
-        if (onRefresh) {
-          onRefresh();
-        }
+      } finally {
+        setSaving(false);
       }
+    };
 
-      if (onSave) {
-        onSave(hospital.id, rows);
-      }
-    } catch (err) {
-      console.error('Failed to save bed availability:', err);
-      const errText = err?.message || 'Failed to save bed availability.';
-      setMsg({
-        type: 'err',
-        text: errText,
-      });
-      setModalMessage(errText);
-      setModalType('warning');
-      setModalOpen(true);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <>
-      <PageLoader
-        loading={saving}
-        text={isUpdate ? 'Saving bed status updates...' : 'Saving bed capacity...'}
-        subtext="Please do not close or refresh this page..."
-      />
-      <div className="ph">
-        <h1>{isUpdate ? 'Daily Bed Status Update' : 'Bed Capacity Setup'}</h1>
-        <Link className="btn" to="/select-hospital">&laquo; Change hospital</Link>
-      </div>
-      <div className="card">
-        <b>Hospital:</b> {hospital.name} &nbsp;
-      </div>
-      {/* <div className="alert info">
+    return (
+      <>
+        <PageLoader
+          loading={saving}
+          text={isUpdate ? 'Saving bed status updates...' : 'Saving bed capacity...'}
+          subtext="Please do not close or refresh this page..."
+        />
+        <div className="ph">
+          <h1>{isUpdate ? 'Daily Bed Status Update' : 'Bed Capacity Setup'}</h1>
+          <Link className="btn" to="/select-hospital">&laquo; Change hospital</Link>
+        </div>
+        <div className="card">
+          <b>Hospital:</b> {hospital.name} &nbsp;
+        </div>
+        {/* <div className="alert info">
         {isUpdate ? (
           <>Enter <b>Occupied</b> beds for each category and quota. Total beds are fixed here.</>
         ) : (
           <>Enter <b>Total</b> beds for each category and quota. Use 0 where the hospital has no such beds.</>
         )}
       </div> */}
-      {msg && <div className={`alert ${msg.type}`}>{msg.text}</div>}
+        {msg && <div className={`alert ${msg.type}`}>{msg.text}</div>}
         <form onSubmit={onSubmit} className="bed-edit-form">
           <BedTable rows={rows} mode={mode} onChange={onChange} categories={cats} />
           <p className="actions">
@@ -412,5 +413,5 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
           okText="OK"
         />
       </>
-      );
-}
+    );
+  }

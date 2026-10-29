@@ -349,42 +349,43 @@ export default function SelectHospital() {
       </form>
 
       {/* Bed Details Section shown after selecting/clicking hospital name */}
+        {Boolean(id) && (
+          <div style={{ marginTop: '20px' }}>
+            <div className="ph">
+              <h2>{selectedHospital?.name || 'Hospital Bed Details'}</h2>
+              {loadingBeds && <span className="sm">Loading bed details...</span>}
+            </div>
 
-      <div style={{ marginTop: '20px' }}>
-        <div className="ph">
-          <h2>{selectedHospital?.name || 'Hospital Bed Details'}</h2>
-          {loadingBeds && <span className="sm">Loading bed details...</span>}
-        </div>
+            <div className="kpi">
+              <div><b>{kpiTotals.total}</b><small>Total Beds</small></div>
+              <div className="o"><b>{kpiTotals.occupied}</b><small>Occupied</small></div>
+              <div className="a"><b>{kpiTotals.available}</b><small>Available</small></div>
+            </div>
 
-        <div className="kpi">
-          <div><b>{kpiTotals.total}</b><small>Total Beds</small></div>
-          <div className="o"><b>{kpiTotals.occupied}</b><small>Occupied</small></div>
-          <div className="a"><b>{kpiTotals.available}</b><small>Available</small></div>
-        </div>
+            {bedError && (
+              <div className="alert err" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{bedError}</span>
+                <button type="button" className="btn s y" onClick={() => fetchBedAvailability(id)}>
+                  Retry
+                </button>
+              </div>
+            )}
 
-        {bedError && (
-          <div className="alert err" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>{bedError}</span>
-            <button type="button" className="btn s y" onClick={() => fetchBedAvailability(id)}>
-              Retry
-            </button>
+            {loadingBeds ? (
+              <div className="card" style={{ textAlign: 'center', padding: '30px', color: '#666' }}>
+                Loading bed availability details...
+              </div>
+            ) : (
+              <>
+                <BedTable rows={bedList} mode="view" showHindi categories={categories} />
+                <p className="legend">
+                  <span className="g">● Beds available</span> &nbsp; <span className="w">● Few beds left (20% or less)</span>{' '}
+                  &nbsp; <span className="r">● Full</span> &nbsp;|&nbsp; Available = Total − Occupied
+                </p>
+              </>
+            )}
           </div>
         )}
-
-        {loadingBeds ? (
-          <div className="card" style={{ textAlign: 'center', padding: '30px', color: '#666' }}>
-            Loading bed availability details...
-          </div>
-        ) : (
-          <>
-            <BedTable rows={bedList} mode="view" showHindi categories={categories} />
-            <p className="legend">
-              <span className="g">● Beds available</span> &nbsp; <span className="w">● Few beds left (20% or less)</span>{' '}
-              &nbsp; <span className="r">● Full</span> &nbsp;|&nbsp; Available = Total − Occupied
-            </p>
-          </>
-        )}
-      </div>
-    </>
-  );
+      </>
+      );
 }
