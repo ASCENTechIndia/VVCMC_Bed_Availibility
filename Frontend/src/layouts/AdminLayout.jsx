@@ -24,7 +24,7 @@ export default function AdminLayout() {
   const navigate = useNavigate();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: pathname, expired: sessionExpired }} />;
+    return <Navigate to="/login" replace state={{ expired: sessionExpired }} />;
   }
 
   const doLogout = (e) => {

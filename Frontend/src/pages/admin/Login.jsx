@@ -28,8 +28,8 @@ export default function Login() {
   }, [location.state, sessionExpired]);
 
   if (isAuthenticated) {
-    const destination = location.state?.from || '/dashboard';
-    return <Navigate to={destination} replace />;
+
+    return <Navigate to="/dashboard" replace />;
   }
 
   const onSubmit = async (e) => {
@@ -90,8 +90,8 @@ export default function Login() {
 
       login(userData, authToken);
 
-      const destination = location.state?.from || '/dashboard';
-      navigate(destination, { replace: true });
+
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Login error:', err);
       setError(err?.message || 'Login failed. Please verify credentials.');
