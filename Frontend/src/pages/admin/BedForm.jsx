@@ -256,12 +256,30 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
   }, [stored, categories]);
 
   const onChange = (ci, qi, field, value) => {
-    setMsg(null);
     setRows((prev) => {
       const next = clone(prev);
       next[ci][qi][field] = value;
-      return next;
-    });
+
+        const cell = next[ci]?.[qi];
+        if (cell && Number(cell.total) < Number(cell.occupied)) {
+          const alertText = 'Total number of beds should not be less than occupied number of beds';
+          setModalMessage(alertText);
+          setModalType('warning');
+          setModalOpen(true);
+        }
+
+        return next;
+      });
+  };
+
+  const onBlur = (ci, qi) => {
+    const cell = rows[ci]?.[qi];
+    if (cell && Number(cell.total) < Number(cell.occupied)) {
+      const alertText = 'Total number of beds should not be less than occupied number of beds';
+      setModalMessage(alertText);
+      setModalType('warning');
+      setModalOpen(true);
+    }
   };
 
   const onSubmit = async (e) => {
@@ -269,7 +287,6 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
     const hasInvalidBeds = rows.some((r) => r.some((c) => Number(c.total) < Number(c.occupied)));
     if (hasInvalidBeds) {
       const alertText = 'Total number of beds should not be less than occupied number of beds';
-      setMsg({ type: 'err', text: alertText });
       setModalMessage(alertText);
       setModalType('warning');
       setModalOpen(true);
@@ -288,93 +305,93 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
           Promise.resolve(getSource()),
         ]);
 
-          // Filter only rows whose data has changed compared to stored
-          const changedRows = rows
-            .map((catRow, ci) => ({ catRow, ci }))
-            .filter(({ catRow, ci }) => {
-              const originalRow = stored?.[ci];
-              if (!originalRow) return true;
-              return catRow.some((c, qi) => {
-                const orig = originalRow[qi] || { total: 0, occupied: 0 };
-                return (
-                  Number(c?.total || 0) !== Number(orig?.total || 0) ||
-                  Number(c?.occupied || 0) !== Number(orig?.occupied || 0)
-                );
+            // Filter only rows whose data has changed compared to stored
+            const changedRows = rows
+              .map((catRow, ci) => ({ catRow, ci }))
+              .filter(({ catRow, ci }) => {
+                const originalRow = stored?.[ci];
+                if (!originalRow) return true;
+                return catRow.some((c, qi) => {
+                  const orig = originalRow[qi] || { total: 0, occupied: 0 };
+                  return (
+                    Number(c?.total || 0) !== Number(orig?.total || 0) ||
+                    Number(c?.occupied || 0) !== Number(orig?.occupied || 0)
+                  );
+                });
               });
+
+            if (changedRows.length === 0) {
+              const noChangeMsg = 'No changes to save.';
+              setMsg({ type: 'ok', text: noChangeMsg });
+              setModalMessage(noChangeMsg);
+              setModalType('success');
+              setModalOpen(true);
+              return;
+            }
+
+              // Post updates to backend insertBedAvailability only for changed categories
+              const requests = changedRows.map(async ({ catRow, ci }) => {
+                const cat = cats[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
+                const reg = catRow[0] || { total: 0, occupied: 0 };
+                const res = catRow[1] || { total: 0, occupied: 0 };
+                const con = catRow[2] || { total: 0, occupied: 0 };
+
+                const availId = Number(cat.BEDAVAIL_ID || cat.bedAvailabilityId || 0);
+                const modeVal = availId > 0 ? 2 : 1;
+
+                const payload = {
+                  userId: targetUserId,
+                  bedAvailabilityId: availId,
+                  ulbId: targetUlbId,
+                  hospitalId: Number(hospital.id),
+                  bedCategoryId: Number(cat.id),
+                  regularTotal: Number(reg.total || 0),
+                  regularOccupied: Number(reg.occupied || 0),
+                  reservedTotal: Number(res.total || 0),
+                  reservedOccupied: Number(res.occupied || 0),
+                  concessionalTotal: Number(con.total || 0),
+                  concessionalOccupied: Number(con.occupied || 0),
+                  status: 'Y',
+                  mode: modeVal,
+                  ipAddress: ipAddress || '127.0.0.1',
+                  ipSource: ipSource || 'RW',
+                };
+
+              const resData = await post('/hospitalMst/insertBedAvailability', payload);
+              return { cat, payload, resData };
             });
 
-          if (changedRows.length === 0) {
-            const noChangeMsg = 'No changes to save.';
-            setMsg({ type: 'ok', text: noChangeMsg });
-            setModalMessage(noChangeMsg);
-            setModalType('success');
-            setModalOpen(true);
-            return;
+            const results = await Promise.all(requests);
+
+            const failed = results.filter(
+              (r) => r?.resData?.data?.errorCode && r.resData.data.errorCode !== 9999
+            );
+
+              if (failed.length > 0) {
+                const firstErr = failed[0]?.resData?.data?.message || 'Failed to update some bed categories.';
+                const errText = `${firstErr} (${failed.length} categories failed)`;
+                setMsg({
+                  type: 'err',
+                  text: errText,
+                });
+                setModalMessage(errText);
+                setModalType('warning');
+                setModalOpen(true);
+              } else {
+                const successMessage =
+                  results[0]?.resData?.data?.message || results[0]?.resData?.message || 'Data Updated Successfully';
+                setMsg({
+                  type: 'ok',
+                  text: successMessage,
+                });
+                setModalMessage(successMessage);
+                setModalType('success');
+                setModalOpen(true);
+
+              if (onRefresh) {
+                onRefresh();
+              }
           }
-
-          // Post updates to backend insertBedAvailability only for changed categories
-          const requests = changedRows.map(async ({ catRow, ci }) => {
-            const cat = cats[ci] || { id: ci + 1, bedAvailabilityId: 0, BEDAVAIL_ID: 0 };
-            const reg = catRow[0] || { total: 0, occupied: 0 };
-            const res = catRow[1] || { total: 0, occupied: 0 };
-            const con = catRow[2] || { total: 0, occupied: 0 };
-
-          const availId = Number(cat.BEDAVAIL_ID || cat.bedAvailabilityId || 0);
-          const modeVal = availId > 0 ? 2 : 1;
-
-          const payload = {
-            userId: targetUserId,
-            bedAvailabilityId: availId,
-            ulbId: targetUlbId,
-            hospitalId: Number(hospital.id),
-            bedCategoryId: Number(cat.id),
-            regularTotal: Number(reg.total || 0),
-            regularOccupied: Number(reg.occupied || 0),
-            reservedTotal: Number(res.total || 0),
-            reservedOccupied: Number(res.occupied || 0),
-            concessionalTotal: Number(con.total || 0),
-            concessionalOccupied: Number(con.occupied || 0),
-            status: 'Y',
-            mode: modeVal,
-            ipAddress: ipAddress || '127.0.0.1',
-            ipSource: ipSource || 'RW',
-          };
-
-          const resData = await post('/hospitalMst/insertBedAvailability', payload);
-          return { cat, payload, resData };
-        });
-
-          const results = await Promise.all(requests);
-
-        const failed = results.filter(
-          (r) => r?.resData?.data?.errorCode && r.resData.data.errorCode !== 9999
-        );
-
-        if (failed.length > 0) {
-          const firstErr = failed[0]?.resData?.data?.message || 'Failed to update some bed categories.';
-          const errText = `${firstErr} (${failed.length} categories failed)`;
-          setMsg({
-            type: 'err',
-            text: errText,
-          });
-          setModalMessage(errText);
-          setModalType('warning');
-          setModalOpen(true);
-        } else {
-          const successMessage =
-            results[0]?.resData?.data?.message || results[0]?.resData?.message || 'Data Updated Successfully';
-          setMsg({
-            type: 'ok',
-            text: successMessage,
-          });
-          setModalMessage(successMessage);
-          setModalType('success');
-          setModalOpen(true);
-
-          if (onRefresh) {
-            onRefresh();
-          }
-        }
 
       if (onSave) {
         onSave(hospital.id, rows);
@@ -415,27 +432,27 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
           <>Enter <b>Total</b> beds for each category and quota. Use 0 where the hospital has no such beds.</>
         )}
       </div> */}
-          {msg && <div className={`alert ${msg.type}`}>{msg.text}</div>}
-          <form onSubmit={onSubmit} className="bed-edit-form">
-            <BedTable rows={rows} mode={mode} onChange={onChange} categories={cats} />
-            <p className="actions">
-              <button className="btn y" type="submit" disabled={saving}>
-                {saving ? 'Saving...' : isUpdate ? 'Save' : 'Save Capacity'}
-              </button>{' '}
-              <Link className="btn g2" to="/select-hospital">Cancel</Link>
-            </p>
-            <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
-          </form>
+            {msg && <div className={`alert ${msg.type}`}>{msg.text}</div>}
+            <form onSubmit={onSubmit} className="bed-edit-form">
+              <BedTable rows={rows} mode={mode} onChange={onChange} onBlur={onBlur} categories={cats} />
+              <p className="actions">
+                <button className="btn y" type="submit" disabled={saving}>
+                  {saving ? 'Saving...' : isUpdate ? 'Save' : 'Save Capacity'}
+                </button>{' '}
+                <Link className="btn g2" to="/select-hospital">Cancel</Link>
+              </p>
+              <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
+            </form>
 
       {/* Response Modal */ }
-    <Modal
-      isOpen={modalOpen}
-      type={modalType}
-      title={modalType === 'success' ? 'Success' : 'Notice'}
-      message={modalMessage}
-      onOk={() => setModalOpen(false)}
-      okText="OK"
-    />
+      <Modal
+        isOpen={modalOpen}
+        type={modalType}
+        title={modalType === 'success' ? 'Success' : 'Notice'}
+        message={modalMessage}
+        onOk={() => setModalOpen(false)}
+        okText="OK"
+      />
     </>
   );
 }
