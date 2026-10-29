@@ -391,26 +391,26 @@ function BedFormInner({ mode, hospital, stored, categories, onSave, onRefresh, u
         )}
       </div> */}
       {msg && <div className={`alert ${msg.type}`}>{msg.text}</div>}
-      <form onSubmit={onSubmit}>
-        <BedTable rows={rows} mode={mode} onChange={onChange} categories={cats} />
-        <p className="actions">
-          <button className="btn y" type="submit" disabled={saving}>
-            {saving ? 'Saving...' : isUpdate ? 'Save' : 'Save Capacity'}
-          </button>{' '}
-          <Link className="btn g2" to="/select-hospital">Cancel</Link>
-        </p>
-        <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
-      </form>
+        <form onSubmit={onSubmit} className="bed-edit-form">
+          <BedTable rows={rows} mode={mode} onChange={onChange} categories={cats} />
+          <p className="actions">
+            <button className="btn y" type="submit" disabled={saving}>
+              {saving ? 'Saving...' : isUpdate ? 'Save' : 'Save Capacity'}
+            </button>{' '}
+            <Link className="btn g2" to="/select-hospital">Cancel</Link>
+          </p>
+          <p className="sm">Available = Total − Occupied (calculated automatically). Occupied cannot exceed Total.</p>
+        </form>
 
-      {/* Response Modal */}
-      <Modal
-        isOpen={modalOpen}
-        type={modalType}
-        title={modalType === 'success' ? 'Success' : 'Notice'}
-        message={modalMessage}
-        onOk={() => setModalOpen(false)}
-        okText="OK"
-      />
-    </>
-  );
+        {/* Response Modal */}
+        <Modal
+          isOpen={modalOpen}
+          type={modalType}
+          title={modalType === 'success' ? 'Success' : 'Notice'}
+          message={modalMessage}
+          onOk={() => setModalOpen(false)}
+          okText="OK"
+        />
+      </>
+      );
 }
