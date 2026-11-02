@@ -22,7 +22,7 @@ async function repoHospitalList(ulbid) {
            a.var_hospital_updby,
            a.dat_hospital_upddt
       FROM aoha_hospital_mas a
-     WHERE a.num_hospital_ulbid = :ulbid
+     WHERE a.num_hospital_ulbid = :ulbid and a.var_hospital_status = 'Y'
      ORDER BY a.num_hospital_id ASC
   `;
   const binds = { ulbid: Number(ulbid || 0) };
