@@ -105,13 +105,7 @@ export default function HospitalList() {
   // Click on Deactivate/Activate button
   const handleToggleStatusClick = (hospital) => {
     setTargetHospital(hospital);
-    if (hospital.active) {
-      // Deactivating/deleting with mode 3: ask for confirmation first
-      setConfirmModalOpen(true);
-    } else {
-      // Activating with mode 2
-      handleActivateHospital(hospital);
-    }
+    setConfirmModalOpen(true);
   };
 
   // Execute mode = 3 to delete / deactivate the hospital

@@ -312,7 +312,7 @@ export default function UpdateHistory() {
             )}
           </select>
         </div>
-        <button className="btn" type="submit" disabled={loadingHistory}>Filter</button>{' '}
+        <button className="btn" type="submit" disabled={loadingHistory}>Submit</button>{' '}
         <button
           className="btn g2"
           type="button"

@@ -9,7 +9,7 @@ import { getIpAddress, getSource } from '../../utils/device.js';
 
 const BASE_TYPES = ['Municipal', 'Government', 'Private', 'Trust'];
 
-const WARD_OPTIONS = ['Ward A', 'Ward B', 'Ward C', 'Ward D', 'Ward E', 'Ward F', 'Ward G', 'Ward H', 'Ward I'];
+const WARD_OPTIONS = ['(A) बोळींज', '(B) विरार (पू)', '(C) चंदनसार', '(D) आचोळे', '(E) नालासोपारा (प)', '(F) पेल्हार', '(G) वालीव', '(H) नवघर-माणिकपुर', '(I) वसई गाव'];
 
 const EMPTY = {
   id: 0,
@@ -400,8 +400,8 @@ export default function HospitalForm({ mode }) {
                   ? 'Updating...'
                   : 'Saving...'
                 : isEdit
-                ? 'Update Hospital'
-                : 'Save Hospital'}
+                  ? 'Update Hospital'
+                  : 'Save Hospital'}
             </button>{' '}
             <button className="btn g2" type="reset" disabled={submitting}>
               Reset
